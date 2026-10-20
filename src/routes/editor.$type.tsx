@@ -16,7 +16,7 @@ import { embedCode, getSchema, loadSaved, saveWidget, type Config, type Field } 
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/editor/$type")({
-  validateSearch: (s: Record<string, unknown>) => ({ id: typeof s.id === "string" ? s.id : undefined }),
+  validateSearch: (s: Record<string, unknown>): { id?: string } => ({ id: typeof s.id === "string" ? s.id : undefined }),
   head: () => ({
     meta: [
       { title: "Customize Widget — WebToolOcean" },
@@ -130,7 +130,7 @@ function FieldControl({ f, value, onChange }: { f: Field; value: Config[string];
       <div className="flex justify-between"><Label htmlFor={id}>{f.label}</Label>{f.type === "range" && <span className="text-xs text-muted-foreground">{String(value)}</span>}</div>
       {f.type === "text" && <Input id={id} value={String(value)} onChange={(e) => onChange(e.target.value)} />}
       {f.type === "textarea" && <Textarea id={id} rows={4} value={String(value)} onChange={(e) => onChange(e.target.value)} />}
-      {f.type === "range" && <Slider id={id} min={f.min} max={f.max} step={f.step ?? 1} value={[Number(value)]} onValueChange={([v]) => onChange(v)} />}
+      {f.type === "range" && <Slider id={id} min={f.min} max={f.max} step={f.step ?? 1} value={[Number(value)]} onValueChange={(v) => onChange(v[0] ?? 0)} />}
       {f.type === "color" && (
         <div className="flex items-center gap-2">
           <input id={id} type="color" value={String(value)} onChange={(e) => onChange(e.target.value)} className="h-9 w-12 cursor-pointer rounded border bg-transparent" />
