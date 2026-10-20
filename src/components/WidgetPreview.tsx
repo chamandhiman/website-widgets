@@ -62,7 +62,7 @@ export function WidgetPreview({ type, c, mobile }: { type: string; c: any; mobil
             <figure key={n} style={{ borderLeft: `3px solid ${c.accent}`, padding: "10px 14px", background: "rgba(0,0,0,0.03)", borderRadius: 8 }}>
               <blockquote style={{ fontSize: 14, fontStyle: "italic" }}>“{q}”</blockquote>
               <figcaption style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8, fontSize: 13, fontWeight: 600 }}>
-                {c.showAvatars && <span style={{ width: 24, height: 24, borderRadius: 99, background: String(c.accent), color: "#fff", display: "grid", placeItems: "center", fontSize: 11 }}>{n[0]}</span>}
+                {c.showAvatars && <span style={{ width: 24, height: 24, borderRadius: 99, background: String(c.accent), color: "#fff", display: "grid", placeItems: "center", fontSize: 11 }}>{n?.[0]}</span>}
                 {n}
               </figcaption>
             </figure>
