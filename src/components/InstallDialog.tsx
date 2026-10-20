@@ -26,7 +26,7 @@ export function InstallDialog({ open, onOpenChange, code }: { open: boolean; onO
   };
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl overflow-hidden">
         <DialogHeader>
           <DialogTitle>Install widget</DialogTitle>
           <DialogDescription>Demo embed snippet — it is not yet connected to a live widget service.</DialogDescription>
@@ -42,8 +42,8 @@ export function InstallDialog({ open, onOpenChange, code }: { open: boolean; onO
         <ol className="list-decimal space-y-1 pl-5 text-sm text-muted-foreground">
           {(PLATFORMS[p] ?? []).map((s) => <li key={s}>{s}</li>)}
         </ol>
-        <div className="relative">
-          <pre className="max-h-64 overflow-auto rounded-xl bg-muted p-4 text-xs"><code>{code}</code></pre>
+        <div className="relative min-w-0">
+          <pre className="max-h-64 overflow-auto whitespace-pre-wrap break-all rounded-xl bg-muted p-4 pt-12 text-xs"><code>{code}</code></pre>
           <Button size="sm" className="absolute right-2 top-2" onClick={copy}>
             {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />} {copied ? "Copied" : "Copy code"}
           </Button>
