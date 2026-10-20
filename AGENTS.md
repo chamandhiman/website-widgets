@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+- Widget Studio catalog lives in src/lib/widgets.ts; a widget is Ready only when it has a schema in SCHEMAS (enforced by test).
+- Saved widgets persist to localStorage (no backend requested).
