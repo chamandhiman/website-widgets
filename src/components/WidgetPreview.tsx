@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Star, X, MessageCircle, ChevronDown } from "lucide-react";
-import type { Config } from "@/lib/widgets";
+
 
 // Widget previews render the user's chosen colors, so inline styles from config are intentional.
 const REVIEWS = [
@@ -13,7 +13,8 @@ function pairs(s: unknown) {
   return String(s ?? "").split("\n").map((l) => l.split("|").map((x) => x.trim())).filter((p) => p[0]);
 }
 
-export function WidgetPreview({ type, c, mobile }: { type: string; c: Config; mobile: boolean }) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function WidgetPreview({ type, c, mobile }: { type: string; c: any; mobile: boolean }) {
   const box = {
     background: String(c.bg), color: String(c.text), borderRadius: Number(c.radius),
     padding: Number(c.padding), maxWidth: Number(c.width) || undefined, width: "100%", margin: "0 auto",
@@ -85,7 +86,7 @@ function Stars({ n, color }: { n: number; color: string }) {
   );
 }
 
-function WhatsApp({ c }: { c: Config }) {
+function WhatsApp({ c }: { c: any }) {
   const [open, setOpen] = useState(Boolean(c.startOpen));
   useEffect(() => setOpen(Boolean(c.startOpen)), [c.startOpen]);
   const side = c.position === "Bottom left" ? { left: 16 } : { right: 16 };
@@ -113,7 +114,7 @@ function WhatsApp({ c }: { c: Config }) {
   );
 }
 
-function Faq({ c, box }: { c: Config; box: React.CSSProperties }) {
+function Faq({ c, box }: { c: any; box: React.CSSProperties }) {
   const items = pairs(c.items);
   const [open, setOpen] = useState<number | null>(c.openFirst ? 0 : null);
   useEffect(() => setOpen(c.openFirst ? 0 : null), [c.openFirst]);
@@ -132,7 +133,7 @@ function Faq({ c, box }: { c: Config; box: React.CSSProperties }) {
   );
 }
 
-function Countdown({ c, box }: { c: Config; box: React.CSSProperties }) {
+function Countdown({ c, box }: { c: any; box: React.CSSProperties }) {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => { const t = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(t); }, []);
   const end = new Date(String(c.target)).getTime();
@@ -154,7 +155,7 @@ function Countdown({ c, box }: { c: Config; box: React.CSSProperties }) {
   );
 }
 
-function Bar({ c, box }: { c: Config; box: React.CSSProperties }) {
+function Bar({ c, box }: { c: any; box: React.CSSProperties }) {
   const [shown, setShown] = useState(true);
   useEffect(() => setShown(true), [c]);
   if (!shown) return <button onClick={() => setShown(true)} style={{ fontSize: 12, textDecoration: "underline", opacity: 0.6 }}>Show bar again</button>;

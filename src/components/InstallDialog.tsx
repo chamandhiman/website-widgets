@@ -40,7 +40,7 @@ export function InstallDialog({ open, onOpenChange, code }: { open: boolean; onO
           ))}
         </div>
         <ol className="list-decimal space-y-1 pl-5 text-sm text-muted-foreground">
-          {PLATFORMS[p].map((s) => <li key={s}>{s}</li>)}
+          {(PLATFORMS[p] ?? []).map((s) => <li key={s}>{s}</li>)}
         </ol>
         <div className="relative">
           <pre className="max-h-64 overflow-auto rounded-xl bg-muted p-4 text-xs"><code>{code}</code></pre>
