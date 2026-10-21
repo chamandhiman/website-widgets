@@ -14,6 +14,12 @@ import { WidgetPreview } from "@/components/WidgetPreview";
 import { InstallDialog } from "@/components/InstallDialog";
 import { embedCode, getSchema, loadSaved, saveWidget, type Config, type Field } from "@/lib/widgets";
 import { cn } from "@/lib/utils";
+import { WhatsAppEditor } from "@/components/whatsapp/WhatsAppEditor";
+import { DEFAULT_WHATSAPP_CONFIG, type WhatsAppWidgetConfig } from "@/lib/whatsapp/types";
+import { AnnouncementEditor } from "@/components/announcement/AnnouncementEditor";
+import { DEFAULT_ANNOUNCEMENT_CONFIG, type AnnouncementBarConfig } from "@/lib/announcement/types";
+import { PopupEditor } from "@/components/popup/PopupEditor";
+import { DEFAULT_POPUP_CONFIG, type PopupWidgetConfig } from "@/lib/popup/types";
 
 export const Route = createFileRoute("/editor/$type")({
   validateSearch: (s: Record<string, unknown>): { id?: string | undefined } => ({ id: typeof s["id"] === "string" ? (s["id"] as string) : undefined }),
@@ -54,6 +60,60 @@ function Editor() {
     );
   }
 
+  // Use the dedicated, high-fidelity WhatsApp Widget Builder for WhatsApp Chat
+  if (type === "whatsapp-chat") {
+    const saved = id ? loadSaved().find((w) => w.id === id) : undefined;
+    const whatsappConfig: WhatsAppWidgetConfig = {
+      ...DEFAULT_WHATSAPP_CONFIG,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ...((saved?.config as any) ?? {}),
+    };
+    return (
+      <WhatsAppEditor
+        initialConfig={whatsappConfig}
+        widgetId={widgetId}
+        widgetName={saved?.name || name || "WhatsApp Chat"}
+        isExisting={Boolean(id)}
+      />
+    );
+  }
+
+  // Use the dedicated Announcement Bar Editor for Announcement Bar
+  if (type === "announcement-bar") {
+    const saved = id ? loadSaved().find((w) => w.id === id) : undefined;
+    const announcementConfig: AnnouncementBarConfig = {
+      ...DEFAULT_ANNOUNCEMENT_CONFIG,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ...((saved?.config as any) ?? {}),
+    };
+    return (
+      <AnnouncementEditor
+        initialConfig={announcementConfig}
+        widgetId={widgetId}
+        widgetName={saved?.name || name || "Announcement Bar"}
+        isExisting={Boolean(id)}
+      />
+    );
+  }
+
+  // Use the dedicated Popup Widget Builder for Popup
+  if (type === "popup" || type === "popup-widget") {
+    const saved = id ? loadSaved().find((w) => w.id === id) : undefined;
+    const popupConfig: PopupWidgetConfig = {
+      ...DEFAULT_POPUP_CONFIG,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ...((saved?.config as any) ?? {}),
+    };
+    return (
+      <PopupEditor
+        initialConfig={popupConfig}
+        widgetId={widgetId}
+        widgetName={saved?.name || name || "Popup Widget"}
+        isExisting={Boolean(id)}
+      />
+    );
+  }
+
   const set = (k: string, v: Config[string]) => setConfig((c) => ({ ...c, [k]: v }));
   const save = () => {
     saveWidget({ id: widgetId, type, name: name || schema.def.name, config, updatedAt: Date.now() });
@@ -85,8 +145,8 @@ function Editor() {
         </Tabs>
         <div className="flex gap-2 border-t p-4">
           <Button variant="ghost" size="icon" onClick={() => setConfig(schema.defaults)} aria-label="Reset settings"><RotateCcw className="h-4 w-4" /></Button>
-          <Button variant="outline" className="flex-1" onClick={save}><Save className="h-4 w-4" /> Save Widget</Button>
-          <Button className="flex-1" onClick={() => setInstall(true)}><Code2 className="h-4 w-4" /> Install</Button>
+          <Button variant="outline" className="flex-1" onClick={() => setInstall(true)}><Code2 className="h-4 w-4" /> Install Widget</Button>
+          <Button className="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-medium" onClick={save}><Save className="h-4 w-4" /> Publish</Button>
         </div>
       </aside>
       <section className="flex min-h-[560px] flex-1 flex-col bg-muted/50">
