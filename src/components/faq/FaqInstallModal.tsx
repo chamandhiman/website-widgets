@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import type { FaqWidgetConfig } from "@/lib/faq/types";
 import { cn } from "@/lib/utils";
+import { getStandardEmbedSnippet } from "@/lib/embed";
 
 interface FaqInstallModalProps {
   open: boolean;
@@ -76,15 +77,11 @@ export function FaqInstallModal({
   const [copied, setCopied] = useState(false);
   const [activePlatform, setActivePlatform] = useState<string>("HTML");
 
-  // Determine current origin or cdn domain
-  const origin = typeof window !== "undefined" ? window.location.origin : "https://webtoolocean.com";
-  const scriptUrl = `${origin}/embed/faq.js`;
-
-  const embedSnippet = `<script
-  src="${scriptUrl}"
-  data-widget-id="${widgetId}"
-  async
-></script>`;
+  // Standard script embed (uses https://cdn.widgets.webtoolocean.com/embed/faq.js)
+  const embedSnippet = getStandardEmbedSnippet({
+    widgetType: "faq",
+    widgetId,
+  });
 
   const handleCopy = async () => {
     try {

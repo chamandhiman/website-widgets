@@ -209,14 +209,18 @@ export function deleteWidget(id: string) {
   localStorage.setItem(KEY, JSON.stringify(loadSaved().filter((x) => x.id !== id)));
 }
 
+import { getWidgetScriptUrl } from "./embed";
+export * from "./embed";
+
 export function embedCode(w: { id: string; type: string; config: Config }) {
-  return `<!-- WebToolOcean ${w.type} widget (DEMO SNIPPET – not connected to a live widget service) -->
+  const scriptUrl = getWidgetScriptUrl(w.type);
+  return `<!-- WebToolOcean ${w.type} widget -->
 <div class="wto-widget" data-widget="${w.type}" data-id="${w.id}"></div>
 <script>
   window.WTO_DEMO_CONFIG = window.WTO_DEMO_CONFIG || {};
   window.WTO_DEMO_CONFIG["${w.id}"] = ${JSON.stringify(w.config)};
 </script>
-<script src="https://cdn.webtoolocean.com/demo/widgets.js" async></script>`;
+<script src="${scriptUrl}" async></script>`;
 }
 
 export function filterWidgets(list: WidgetDef[], q: string, cat: string) {

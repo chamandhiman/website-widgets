@@ -198,9 +198,9 @@ describe("Announcement Bar Widget - Comprehensive Acceptance Tests", () => {
   // Scenario 11: Embed snippet matches specified format with data-widget-id
   it("Scenario 11: Embed snippet uses data-widget-id and async script", () => {
     const id = "wto_bar_987";
-    const standardSnippet = `<script\n  src="https://cdn.webtoolocean.com/embed/announcement-bar.js"\n  data-widget-id="${id}"\n  async\n></script>`;
+    const standardSnippet = `<script\n  src="https://cdn.widgets.webtoolocean.com/embed/announcement-bar.js"\n  data-widget-id="${id}"\n  async\n></script>`;
     expect(standardSnippet).toContain(`data-widget-id="${id}"`);
-    expect(standardSnippet).toContain("announcement-bar.js");
+    expect(standardSnippet).toContain("https://cdn.widgets.webtoolocean.com/embed/announcement-bar.js");
   });
 
   // Scenario 12: Standalone inline configuration snippet contains complete config object

@@ -21,6 +21,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { PopupWidgetConfig } from "@/lib/popup/types";
+import {
+  getStandardEmbedSnippet,
+  getStandaloneEmbedSnippet,
+} from "@/lib/embed";
 
 interface PopupInstallModalProps {
   isOpen: boolean;
@@ -39,31 +43,18 @@ export const PopupInstallModal: FC<PopupInstallModalProps> = ({
   const [copiedId, setCopiedId] = useState(false);
   const [selectedPlatform, setSelectedPlatform] = useState("html");
 
-  // Derive origin or fallback
-  const origin =
-    typeof window !== "undefined" && window.location.origin
-      ? window.location.origin
-      : "https://webtoolocean.com";
-
-  // Standard embed script
-  const embedCodeSnippet = `<!-- WebToolOcean Popup Widget -->
-<script
-  src="${origin}/embed/popup.js"
-  data-widget-id="${widgetId}"
-  async
-></script>`;
+  // Standard embed script (uses https://cdn.widgets.webtoolocean.com/embed/popup.js)
+  const embedCodeSnippet = getStandardEmbedSnippet({
+    widgetType: "popup",
+    widgetId,
+  });
 
   // Self-contained inline config snippet (allows instantaneous embedding without backend database)
-  const inlineCodeSnippet = `<!-- WebToolOcean Popup Widget (Self-Contained) -->
-<script>
-  window.WTO_POPUP_CONFIGS = window.WTO_POPUP_CONFIGS || {};
-  window.WTO_POPUP_CONFIGS["${widgetId}"] = ${JSON.stringify(config, null, 2)};
-</script>
-<script
-  src="${origin}/embed/popup.js"
-  data-widget-id="${widgetId}"
-  async
-></script>`;
+  const inlineCodeSnippet = getStandaloneEmbedSnippet({
+    widgetType: "popup",
+    widgetId,
+    config,
+  });
 
   const handleCopy = (text: string, isSnippet = true) => {
     navigator.clipboard.writeText(text);

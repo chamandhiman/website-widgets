@@ -163,9 +163,9 @@ describe("WhatsApp Chat Widget - Comprehensive Acceptance Tests", () => {
   // Scenario 14: Install dialog embed code contains widget ID and async loader
   it("Scenario 14: Embed code format matches spec with data-widget-id", () => {
     const id = "wto_abc123";
-    const snippet = `<script\n  src="https://cdn.webtoolocean.com/embed/whatsapp.js"\n  data-widget-id="${id}"\n  async\n></script>`;
+    const snippet = `<script\n  src="https://cdn.widgets.webtoolocean.com/embed/whatsapp.js"\n  data-widget-id="${id}"\n  async\n></script>`;
     expect(snippet).toContain(`data-widget-id="${id}"`);
-    expect(snippet).toContain("whatsapp.js");
+    expect(snippet).toContain("https://cdn.widgets.webtoolocean.com/embed/whatsapp.js");
     expect(snippet).toContain("async");
   });
 

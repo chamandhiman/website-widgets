@@ -11,6 +11,10 @@ import {
 import { Button } from "@/components/ui/button";
 import type { AnnouncementBarConfig } from "@/lib/announcement/types";
 import { cn } from "@/lib/utils";
+import {
+  getStandardEmbedSnippet,
+  getStandaloneEmbedSnippet,
+} from "@/lib/embed";
 
 interface AnnouncementInstallModalProps {
   open: boolean;
@@ -79,42 +83,32 @@ export function AnnouncementInstallModal({
   widgetId,
   config,
 }: AnnouncementInstallModalProps) {
-  const isLocalhost =
-    typeof window !== "undefined" &&
-    (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
-
   const localHostOrigin =
     typeof window !== "undefined" && window.location.origin
       ? window.location.origin
       : "http://localhost:8082";
 
-  const [scriptHostMode, setScriptHostMode] = useState<"local" | "cdn">(
-    isLocalhost ? "local" : "cdn"
-  );
+  const [scriptHostMode, setScriptHostMode] = useState<"local" | "cdn">("cdn");
   const [activeTab, setActiveTab] = useState<"standard" | "inline">("standard");
   const [platform, setPlatform] = useState<string>("HTML");
   const [copied, setCopied] = useState(false);
 
-  const scriptBaseUrl = scriptHostMode === "local" ? localHostOrigin : "https://cdn.webtoolocean.com";
-
-  // Standard script embed
-  const standardScript = `<script
-  src="${scriptBaseUrl}/embed/announcement-bar.js"
-  data-widget-id="${widgetId}"
-  async
-></script>`;
+  // Standard script embed (uses https://cdn.widgets.webtoolocean.com/embed/announcement-bar.js)
+  const standardScript = getStandardEmbedSnippet({
+    widgetType: "announcement-bar",
+    widgetId,
+    hostMode: scriptHostMode,
+    localOrigin: localHostOrigin,
+  });
 
   // Standalone self-contained inline snippet (works immediately anywhere without a backend!)
-  const standaloneScript = `<!-- WebToolOcean Announcement Bar Widget -->
-<script>
-  window.WTO_ANNOUNCEMENT_CONFIGS = window.WTO_ANNOUNCEMENT_CONFIGS || {};
-  window.WTO_ANNOUNCEMENT_CONFIGS["${widgetId}"] = ${JSON.stringify(config, null, 2)};
-</script>
-<script
-  src="${scriptBaseUrl}/embed/announcement-bar.js"
-  data-widget-id="${widgetId}"
-  async
-></script>`;
+  const standaloneScript = getStandaloneEmbedSnippet({
+    widgetType: "announcement-bar",
+    widgetId,
+    config,
+    hostMode: scriptHostMode,
+    localOrigin: localHostOrigin,
+  });
 
   const activeCode = activeTab === "standard" ? standardScript : standaloneScript;
 

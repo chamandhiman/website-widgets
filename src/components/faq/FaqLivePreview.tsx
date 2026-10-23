@@ -175,64 +175,20 @@ export const FaqLivePreview: FC<FaqLivePreviewProps> = ({
         </div>
       </div>
 
-      {/* Realistic Browser Frame Containing Website & Widget */}
-      <div className="relative flex justify-center overflow-hidden rounded-2xl border border-border/80 bg-slate-100/80 p-3 md:p-6 dark:bg-slate-950/60 min-h-[580px]">
+      {/* Live Preview Area - Shows ONLY the FAQ Widget */}
+      <div className="relative flex justify-center overflow-y-auto rounded-2xl border border-border/80 bg-slate-50/70 dark:bg-slate-950/40 p-4 md:p-8 min-h-[580px]">
         <div
           className={cn(
-            "w-full rounded-2xl border border-border/90 bg-white shadow-lg overflow-hidden transition-all duration-300 flex flex-col dark:bg-slate-900",
+            "w-full transition-all duration-300 flex justify-center items-start",
             activeViewport === "mobile"
               ? "max-w-[375px]"
               : activeViewport === "tablet"
               ? "max-w-[768px]"
-              : "max-w-5xl"
+              : "w-full"
           )}
         >
-          {/* Mockup Browser Window Header */}
-          <div className="flex items-center gap-2 border-b border-border/70 bg-slate-100 px-4 py-2.5 dark:bg-slate-800/80 select-none">
-            <div className="flex gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-full bg-rose-400" />
-              <span className="h-2.5 w-2.5 rounded-full bg-amber-400" />
-              <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
-            </div>
-            <div className="mx-auto flex h-6 w-3/5 items-center justify-center rounded-md border border-border/50 bg-white/90 px-3 text-[11px] font-mono text-muted-foreground dark:bg-slate-900">
-              https://acme-store.com/faq-support
-            </div>
-          </div>
-
-          {/* Mock Website Navigation Bar */}
-          <div className="flex items-center justify-between border-b border-border/50 bg-white px-5 py-3 dark:bg-slate-900">
-            <div className="flex items-center gap-2">
-              <div className="grid h-7 w-7 place-items-center rounded-lg bg-gradient-to-tr from-purple-600 to-indigo-600 text-white font-black text-xs">
-                A
-              </div>
-              <span className="font-bold text-sm tracking-tight text-foreground">
-                Acme Store
-              </span>
-            </div>
-            <div className="hidden sm:flex items-center gap-4 text-xs font-medium text-muted-foreground">
-              <span className="hover:text-foreground cursor-pointer">Home</span>
-              <span className="hover:text-foreground cursor-pointer">Products</span>
-              <span className="text-purple-600 font-semibold cursor-pointer">FAQ</span>
-              <span className="hover:text-foreground cursor-pointer">Contact</span>
-            </div>
-          </div>
-
-          {/* Mock Website Hero / Banner */}
-          <div className="bg-gradient-to-b from-purple-500/5 via-indigo-500/5 to-transparent px-6 py-6 text-center border-b border-border/30">
-            <span className="inline-flex items-center gap-1 rounded-full bg-purple-500/10 px-2.5 py-0.5 text-[10px] font-bold text-purple-700 dark:text-purple-300 mb-2">
-              Help Center & Knowledge Base
-            </span>
-            <h2 className="text-xl sm:text-2xl font-black tracking-tight text-foreground">
-              How can we assist you today?
-            </h2>
-            <p className="mt-1 text-xs text-muted-foreground max-w-md mx-auto">
-              Find quick answers to common questions about shipping, returns, and support.
-            </p>
-          </div>
-
           {/* ================= ACTUAL FAQ WIDGET COMPONENT ================= */}
-          <div className="flex-1 p-4 sm:p-8 overflow-y-auto">
-            <div
+          <div
               style={{
                 maxWidth: `${config.maxWidth}px`,
                 backgroundColor: config.showContainerBg ? config.bgColor : "transparent",
@@ -261,32 +217,32 @@ export const FaqLivePreview: FC<FaqLivePreviewProps> = ({
               {/* FAQ Widget Heading Section */}
               {config.showHeading && (
                 <div
-                  className="mb-6 space-y-1"
+                  className="mb-7 space-y-1.5"
                   style={{
                     textAlign: config.headingAlignment,
                   }}
                 >
                   <h3
                     style={{
-                      fontSize: `${config.fontSizeHeading}px`,
-                      color: config.headingColor,
+                      fontSize: `${Math.max(config.fontSizeHeading, 28)}px`,
+                      color: config.headingColor || "#0f172a",
                     }}
-                    className="font-black tracking-tight leading-snug"
+                    className="font-black tracking-tight leading-tight text-slate-950 dark:text-white"
                   >
                     {config.heading}
                   </h3>
                   {config.subtitle && (
                     <p
-                      style={{ color: config.answerColor }}
-                      className="text-xs sm:text-sm opacity-90 leading-relaxed"
+                      style={{ color: config.answerColor || "#1e293b" }}
+                      className="text-sm sm:text-base font-bold leading-relaxed text-slate-800 dark:text-slate-100"
                     >
                       {config.subtitle}
                     </p>
                   )}
                   {config.introText && (
                     <p
-                      style={{ color: config.answerColor }}
-                      className="text-xs opacity-75 pt-1"
+                      style={{ color: config.answerColor || "#1e293b" }}
+                      className="text-xs sm:text-sm font-semibold pt-1 leading-relaxed text-slate-700 dark:text-slate-200"
                     >
                       {config.introText}
                     </p>
@@ -428,18 +384,11 @@ export const FaqLivePreview: FC<FaqLivePreviewProps> = ({
                           <div className="flex items-center gap-2 min-w-0">
                             <span
                               style={{
-                                fontSize: `${config.fontSizeQuestion}px`,
-                                color: config.questionColor,
-                                fontWeight:
-                                  config.fontWeightQuestion === "bold"
-                                    ? 700
-                                    : config.fontWeightQuestion === "semibold"
-                                    ? 600
-                                    : config.fontWeightQuestion === "medium"
-                                    ? 500
-                                    : 400,
+                                fontSize: `${Math.max(config.fontSizeQuestion, 16)}px`,
+                                color: config.questionColor || "#0f172a",
+                                fontWeight: config.fontWeightQuestion === "normal" ? 500 : 700,
                               }}
-                              className="leading-snug tracking-tight"
+                              className="leading-snug tracking-tight font-bold text-slate-950 dark:text-white"
                             >
                               {item.question}
                             </span>
@@ -511,7 +460,6 @@ export const FaqLivePreview: FC<FaqLivePreviewProps> = ({
                   })}
                 </div>
               )}
-            </div>
           </div>
         </div>
       </div>
@@ -537,8 +485,8 @@ function AnswerRenderer({
 
   return (
     <div
-      style={{ fontSize: `${fontSize}px`, color }}
-      className="space-y-2 leading-relaxed opacity-95"
+      style={{ fontSize: `${Math.max(fontSize, 15)}px`, color: color || "#1e293b" }}
+      className="space-y-2.5 leading-relaxed font-semibold text-slate-900 dark:text-slate-100"
     >
       {paragraphs.map((p, pIdx) => {
         const lines = p.split("\n").filter(Boolean);

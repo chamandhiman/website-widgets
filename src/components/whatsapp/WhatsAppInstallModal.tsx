@@ -11,6 +11,10 @@ import {
 import { Button } from "@/components/ui/button";
 import type { WhatsAppWidgetConfig } from "@/lib/whatsapp/types";
 import { cn } from "@/lib/utils";
+import {
+  getStandardEmbedSnippet,
+  getStandaloneEmbedSnippet,
+} from "@/lib/embed";
 
 interface WhatsAppInstallModalProps {
   open: boolean;
@@ -81,42 +85,32 @@ export function WhatsAppInstallModal({
   widgetId,
   config,
 }: WhatsAppInstallModalProps) {
-  const isLocalhost =
-    typeof window !== "undefined" &&
-    (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
-
   const localHostOrigin =
     typeof window !== "undefined" && window.location.origin
       ? window.location.origin
       : "http://localhost:8082";
 
-  const [scriptHostMode, setScriptHostMode] = useState<"local" | "cdn">(
-    isLocalhost ? "local" : "cdn"
-  );
+  const [scriptHostMode, setScriptHostMode] = useState<"local" | "cdn">("cdn");
   const [activeTab, setActiveTab] = useState<"standard" | "inline">("standard");
   const [platform, setPlatform] = useState<string>("HTML");
   const [copied, setCopied] = useState(false);
 
-  const scriptBaseUrl = scriptHostMode === "local" ? localHostOrigin : "https://cdn.webtoolocean.com";
+  // Standard script embed (uses https://cdn.widgets.webtoolocean.com/embed/whatsapp.js)
+  const standardScript = getStandardEmbedSnippet({
+    widgetType: "whatsapp",
+    widgetId,
+    hostMode: scriptHostMode,
+    localOrigin: localHostOrigin,
+  });
 
-  // Standard script embed (as specified in Section 6)
-  const standardScript = `<script
-  src="${scriptBaseUrl}/embed/whatsapp.js"
-  data-widget-id="${widgetId}"
-  async
-></script>`;
-
-  // Standalone inline config script (works anywhere immediately without a backend!)
-  const standaloneScript = `<!-- WebToolOcean WhatsApp Chat Widget -->
-<script>
-  window.WTO_WIDGET_CONFIGS = window.WTO_WIDGET_CONFIGS || {};
-  window.WTO_WIDGET_CONFIGS["${widgetId}"] = ${JSON.stringify(config, null, 2)};
-</script>
-<script
-  src="${scriptBaseUrl}/embed/whatsapp.js"
-  data-widget-id="${widgetId}"
-  async
-></script>`;
+  // Standalone inline config script
+  const standaloneScript = getStandaloneEmbedSnippet({
+    widgetType: "whatsapp",
+    widgetId,
+    config,
+    hostMode: scriptHostMode,
+    localOrigin: localHostOrigin,
+  });
 
   const activeCode = activeTab === "standard" ? standardScript : standaloneScript;
 

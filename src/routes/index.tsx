@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Boxes, CheckCircle2, Clock, Sparkles } from "lucide-react";
-import { PageHeader } from "@/components/StudioLayout";
+import { Boxes, CheckCircle2, Clock } from "lucide-react";
 import { WidgetCatalog } from "@/components/WidgetCatalog";
 import { WIDGETS, loadSaved } from "@/lib/widgets";
 import { cn } from "@/lib/utils";
@@ -30,8 +29,6 @@ function Index() {
       cardBg: "bg-gradient-to-br from-emerald-500/12 via-teal-500/5 to-transparent border-emerald-500/30",
       iconBg: "bg-gradient-to-tr from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/30",
       valueColor: "text-emerald-700 dark:text-emerald-300",
-      badge: "Production Ready",
-      badgeClass: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30",
     },
     {
       label: "Coming Soon",
@@ -40,8 +37,6 @@ function Index() {
       cardBg: "bg-gradient-to-br from-amber-500/12 via-orange-500/5 to-transparent border-amber-500/30",
       iconBg: "bg-gradient-to-tr from-amber-500 to-orange-500 text-white shadow-md shadow-amber-500/30",
       valueColor: "text-amber-700 dark:text-amber-300",
-      badge: "In Development",
-      badgeClass: "bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30",
     },
     {
       label: "My Saved Widgets",
@@ -50,63 +45,52 @@ function Index() {
       cardBg: "bg-gradient-to-br from-purple-500/12 via-indigo-500/5 to-transparent border-purple-500/30",
       iconBg: "bg-gradient-to-tr from-purple-600 via-violet-600 to-indigo-600 text-white shadow-md shadow-purple-500/30",
       valueColor: "text-purple-700 dark:text-purple-300",
-      badge: "Local Studio",
-      badgeClass: "bg-purple-500/15 text-purple-700 dark:text-purple-300 border-purple-500/30",
     },
   ];
 
   return (
-    <div className="mx-auto max-w-7xl p-5 md:p-8 space-y-8">
-      {/* Hero / Header */}
-      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between border-b pb-6 border-border/70">
-        <div>
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-purple-500/15 to-pink-500/15 px-3 py-1 text-xs font-bold text-purple-700 dark:text-purple-300 border border-purple-500/20 mb-2">
-            <Sparkles className="h-3.5 w-3.5 text-purple-500" />
-            <span>WebToolOcean Widget Studio</span>
-          </div>
-          <h1 className="text-3xl font-black tracking-tight text-foreground md:text-4xl">
+    <div className="mx-auto max-w-[1600px] p-4 sm:p-6 lg:p-7 space-y-4 md:space-y-5">
+      {/* Top Header Row: Title & Subtitle on Left, 3 Stat Boxes on Right */}
+      <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4 pb-4 border-b border-border/70">
+        <div className="max-w-xl">
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-foreground">
             Explore Website Widgets
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground max-w-2xl leading-relaxed">
+          <p className="mt-1 text-xs sm:text-sm font-medium text-muted-foreground leading-relaxed">
             Pick from lightweight, customizable widgets and embed them on any website with a single JavaScript snippet.
           </p>
         </div>
-      </div>
 
-      {/* Colorful Stats Cards */}
-      <div className="grid gap-4 sm:grid-cols-3">
-        {stats.map((s) => (
-          <div
-            key={s.label}
-            className={cn(
-              "relative overflow-hidden flex items-center justify-between gap-4 rounded-3xl border p-5 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-lg backdrop-blur-xs",
-              s.cardBg
-            )}
-          >
-            <div className="flex items-center gap-4">
-              <span className={cn("grid h-12 w-12 place-items-center rounded-2xl", s.iconBg)}>
-                <s.icon className="h-6 w-6" />
-              </span>
-              <div>
-                <div className={cn("text-3xl font-black tracking-tight", s.valueColor)}>
-                  {s.value}
-                </div>
-                <div className="text-xs font-semibold text-muted-foreground">{s.label}</div>
-              </div>
-            </div>
-            <span
+        {/* 3 Compact Stat Boxes in Top Row */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 shrink-0 xl:max-w-xl w-full xl:w-auto">
+          {stats.map((s) => (
+            <div
+              key={s.label}
               className={cn(
-                "hidden sm:inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-bold border",
-                s.badgeClass
+                "relative flex flex-col justify-between rounded-2xl border p-3 shadow-2xs transition-all duration-200 hover:shadow-xs backdrop-blur-xs min-w-[140px]",
+                s.cardBg
               )}
             >
-              {s.badge}
-            </span>
-          </div>
-        ))}
+              {/* Top: Icon and Count */}
+              <div className="flex items-center gap-2.5">
+                <span className={cn("grid h-9 w-9 place-items-center rounded-xl shrink-0 shadow-2xs", s.iconBg)}>
+                  <s.icon className="h-4.5 w-4.5" />
+                </span>
+                <span className={cn("text-2xl font-black tracking-tight leading-none", s.valueColor)}>
+                  {s.value}
+                </span>
+              </div>
+
+              {/* Bottom: Text Label */}
+              <div className="mt-2 text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 whitespace-nowrap">
+                {s.label}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* Main Catalog */}
+      {/* Main Catalog: Immediately visible on screen */}
       <WidgetCatalog />
     </div>
   );

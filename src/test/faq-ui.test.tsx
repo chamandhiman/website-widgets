@@ -111,7 +111,7 @@ describe("FAQ Widget UI Components", () => {
     expect(screen.queryByText("Delivery speed?")).not.toBeInTheDocument();
   });
 
-  it("FaqConfigTabs renders all 4 tabs (Templates, Content, Layout, Settings) and allows adding a question", () => {
+  it("FaqConfigTabs renders 3 simple tabs (Templates, Content, Design) and allows adding a question", () => {
     const onChange = vi.fn();
     render(
       <FaqConfigTabs
@@ -126,11 +126,10 @@ describe("FAQ Widget UI Components", () => {
       />
     );
 
-    // Verify all 4 tabs exist
+    // Verify exactly 3 tabs exist
     expect(screen.getByRole("tab", { name: /templates/i })).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: /content/i })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: /layout/i })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: /settings/i })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /design/i })).toBeInTheDocument();
 
     // Click Add Question button
     const addBtn = screen.getByRole("button", { name: /add question/i });

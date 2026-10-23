@@ -5,23 +5,17 @@ import {
   Copy,
   ChevronDown,
   ChevronUp,
-  Sparkles,
   MoveUp,
   MoveDown,
   LayoutGrid,
   FileText,
   Palette,
-  Sliders,
   Search,
-  Tag,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
   Columns,
   Grid,
   ArrowRight,
   ArrowLeft,
-  RotateCcw,
+  Check,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,14 +24,13 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FaqTemplateGallery } from "./FaqTemplateGallery";
-import type { FaqWidgetConfig, FaqItem, FaqTemplateId } from "@/lib/faq/types";
-import { FAQ_TEMPLATES, type FaqTemplateDefinition } from "@/lib/faq/templates";
+import type { FaqWidgetConfig, FaqItem } from "@/lib/faq/types";
+import type { FaqTemplateDefinition } from "@/lib/faq/templates";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
-export type FaqEditorTab = "templates" | "content" | "layout" | "settings";
+export type FaqEditorTab = "templates" | "content" | "design";
 
 interface FaqConfigTabsProps {
   config: FaqWidgetConfig;
@@ -52,7 +45,7 @@ interface FaqConfigTabsProps {
   onTabChange?: (tab: FaqEditorTab) => void;
 }
 
-const COLOR_PRESETS = [
+const COLOR_SWATCHES = [
   { name: "Studio Purple", accent: "#7c3aed", bg: "#ffffff", card: "#ffffff", text: "#0f172a" },
   { name: "Ocean Blue", accent: "#2563eb", bg: "#ffffff", card: "#f8fafc", text: "#0f172a" },
   { name: "Emerald", accent: "#059669", bg: "#ffffff", card: "#f0fdf4", text: "#0f172a" },
@@ -79,11 +72,11 @@ export const FaqConfigTabs: FC<FaqConfigTabsProps> = ({
     setInternalTab(tab);
     onTabChange?.(tab);
   };
+
   const [expandedItemId, setExpandedItemId] = useState<string | null>(
     config.items[0]?.id || null
   );
   const [newlyAddedId, setNewlyAddedId] = useState<string | null>(null);
-  const [newCategoryName, setNewCategoryName] = useState("");
 
   // FAQ Items Handlers
   const handleAddItem = () => {
@@ -92,7 +85,6 @@ export const FaqConfigTabs: FC<FaqConfigTabsProps> = ({
       id: newId,
       question: "New question",
       answer: "",
-      category: config.categories.find((c) => c !== "All") || "General",
     };
     onChange("items", [...config.items, newItem]);
     setExpandedItemId(newId);
@@ -157,28 +149,7 @@ export const FaqConfigTabs: FC<FaqConfigTabsProps> = ({
     }
   };
 
-  // Category Management Handlers
-  const handleAddCategory = () => {
-    const trimmed = newCategoryName.trim();
-    if (!trimmed || config.categories.includes(trimmed)) return;
-    onChange("categories", [...config.categories, trimmed]);
-    setNewCategoryName("");
-  };
-
-  const handleDeleteCategory = (cat: string) => {
-    if (cat === "All" || config.categories.length <= 2) return;
-    onChange(
-      "categories",
-      config.categories.filter((c) => c !== cat)
-    );
-    // Unassign deleted category from items
-    const updatedItems = config.items.map((it) =>
-      it.category === cat ? { ...it, category: undefined } : it
-    );
-    onChange("items", updatedItems);
-  };
-
-  const handleApplyPreset = (preset: (typeof COLOR_PRESETS)[0]) => {
+  const handleApplyPreset = (preset: (typeof COLOR_SWATCHES)[0]) => {
     onChange("accentColor", preset.accent);
     onChange("bgColor", preset.bg);
     onChange("cardBgColor", preset.card);
@@ -188,42 +159,35 @@ export const FaqConfigTabs: FC<FaqConfigTabsProps> = ({
   };
 
   return (
-    <div className="flex h-full flex-col bg-card rounded-2xl border border-border/70 shadow-xs overflow-hidden">
+    <div className="flex h-full flex-col bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
       <Tabs
         value={activeTab}
         onValueChange={(val) => setActiveTab(val as FaqEditorTab)}
         className="flex h-full flex-col min-h-0"
       >
-        {/* 4 Clean Tabs: Templates, Content, Layout, Settings */}
-        <div className="border-b border-border/70 bg-muted/40 px-3 py-2 shrink-0">
-          <TabsList className="grid w-full grid-cols-4 bg-muted/70 p-1">
+        {/* Exactly 3 Clean, Simple Tabs: Templates, Content, Design */}
+        <div className="border-b border-border/80 bg-muted/50 px-4 py-2.5 shrink-0">
+          <TabsList className="grid w-full grid-cols-3 bg-muted p-1 rounded-xl">
             <TabsTrigger
               value="templates"
-              className="flex items-center gap-1.5 text-xs font-semibold data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-xs"
+              className="flex items-center justify-center gap-2 py-2 text-xs md:text-sm font-bold text-slate-700 dark:text-slate-300 data-[state=active]:bg-card data-[state=active]:text-slate-950 dark:data-[state=active]:text-white data-[state=active]:shadow-sm transition-all"
             >
-              <LayoutGrid className="h-3.5 w-3.5 text-purple-600" />
+              <LayoutGrid className="h-4 w-4 text-purple-600" />
               <span>Templates</span>
             </TabsTrigger>
             <TabsTrigger
               value="content"
-              className="flex items-center gap-1.5 text-xs font-semibold data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-xs"
+              className="flex items-center justify-center gap-2 py-2 text-xs md:text-sm font-bold text-slate-700 dark:text-slate-300 data-[state=active]:bg-card data-[state=active]:text-slate-950 dark:data-[state=active]:text-white data-[state=active]:shadow-sm transition-all"
             >
-              <FileText className="h-3.5 w-3.5 text-blue-600" />
+              <FileText className="h-4 w-4 text-blue-600" />
               <span>Content</span>
             </TabsTrigger>
             <TabsTrigger
-              value="layout"
-              className="flex items-center gap-1.5 text-xs font-semibold data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-xs"
+              value="design"
+              className="flex items-center justify-center gap-2 py-2 text-xs md:text-sm font-bold text-slate-700 dark:text-slate-300 data-[state=active]:bg-card data-[state=active]:text-slate-950 dark:data-[state=active]:text-white data-[state=active]:shadow-sm transition-all"
             >
-              <Palette className="h-3.5 w-3.5 text-emerald-600" />
-              <span>Layout</span>
-            </TabsTrigger>
-            <TabsTrigger
-              value="settings"
-              className="flex items-center gap-1.5 text-xs font-semibold data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-xs"
-            >
-              <Sliders className="h-3.5 w-3.5 text-amber-600" />
-              <span>Settings</span>
+              <Palette className="h-4 w-4 text-emerald-600" />
+              <span>Design</span>
             </TabsTrigger>
           </TabsList>
         </div>
@@ -240,27 +204,28 @@ export const FaqConfigTabs: FC<FaqConfigTabsProps> = ({
               onSelectTemplate(template);
               setActiveTab("content");
               toast.success(`Selected ${template.name}`, {
-                description: "Ready to customize questions and header content.",
+                description: "Ready to customize your questions.",
               });
             }}
           />
         </TabsContent>
 
-        {/* Tab 2: Content (Dedicated exclusively to FAQ content) */}
+        {/* Tab 2: Content (Simple, focused on questions without clutter) */}
         <TabsContent
           value="content"
-          className="m-0 flex-1 overflow-y-auto p-4 space-y-5 scrollbar-thin focus-visible:outline-hidden"
+          className="m-0 flex-1 overflow-y-auto p-4 md:p-5 space-y-5 scrollbar-thin focus-visible:outline-hidden"
         >
           {/* Section: Header Content */}
-          <div className="rounded-xl border border-border/70 bg-card p-3.5 space-y-3 shadow-2xs">
-            <div className="flex items-center justify-between border-b border-border/50 pb-2">
-              <span className="text-xs font-bold text-foreground">Header & Description</span>
-              <span className="text-[10px] text-muted-foreground">Title details</span>
+          <div className="rounded-xl border border-border bg-card p-4 space-y-3.5 shadow-2xs">
+            <div className="flex items-center justify-between border-b border-border/60 pb-2">
+              <span className="text-sm font-extrabold text-slate-950 dark:text-white">
+                Title & Subtitle
+              </span>
             </div>
 
             <div className="space-y-3">
-              <div className="space-y-1">
-                <Label htmlFor="faq-heading" className="text-[11px] font-semibold text-muted-foreground">
+              <div className="space-y-1.5">
+                <Label htmlFor="faq-heading" className="text-xs font-bold text-slate-900 dark:text-slate-100">
                   FAQ Heading *
                 </Label>
                 <Input
@@ -268,37 +233,23 @@ export const FaqConfigTabs: FC<FaqConfigTabsProps> = ({
                   value={config.heading}
                   onChange={(e) => onChange("heading", e.target.value)}
                   placeholder="Frequently Asked Questions"
-                  className="h-8.5 text-xs font-semibold"
+                  className="h-9 text-sm font-bold text-slate-900 dark:text-slate-100"
                 />
                 {errors["heading"] && (
-                  <p className="text-[10px] text-destructive">{errors["heading"]}</p>
+                  <p className="text-xs font-bold text-destructive">{errors["heading"]}</p>
                 )}
               </div>
 
-              <div className="space-y-1">
-                <Label htmlFor="faq-sub" className="text-[11px] font-semibold text-muted-foreground">
-                  Subtitle / Description (optional)
+              <div className="space-y-1.5">
+                <Label htmlFor="faq-sub" className="text-xs font-bold text-slate-900 dark:text-slate-100">
+                  Subtitle (optional)
                 </Label>
                 <Input
                   id="faq-sub"
                   value={config.subtitle}
                   onChange={(e) => onChange("subtitle", e.target.value)}
                   placeholder="Find quick answers to common questions about our products."
-                  className="h-8 text-xs"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <Label htmlFor="faq-intro" className="text-[11px] font-semibold text-muted-foreground">
-                  Introductory Note (optional)
-                </Label>
-                <Textarea
-                  id="faq-intro"
-                  value={config.introText}
-                  onChange={(e) => onChange("introText", e.target.value)}
-                  placeholder="Have more questions? Contact our 24/7 customer support."
-                  rows={2}
-                  className="text-xs resize-none"
+                  className="h-8.5 text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200"
                 />
               </div>
             </div>
@@ -307,12 +258,12 @@ export const FaqConfigTabs: FC<FaqConfigTabsProps> = ({
           {/* Section: FAQ Questions (Sticky toolbar ensures Add Question is always accessible) */}
           <div className="space-y-3 relative">
             {/* Sticky Header Toolbar */}
-            <div className="sticky top-0 z-20 flex items-center justify-between bg-card/95 backdrop-blur-xs py-2.5 px-3 border-y border-border/70 -mx-4 shadow-2xs">
+            <div className="sticky top-0 z-20 flex items-center justify-between bg-card/95 backdrop-blur-xs py-3 px-3.5 border-y border-border -mx-4 md:-mx-5 shadow-2xs">
               <div>
-                <h3 className="text-xs font-bold text-foreground">
+                <h3 className="text-sm font-extrabold text-slate-950 dark:text-white">
                   FAQ Questions ({config.items.length})
                 </h3>
-                <p className="text-[10px] text-muted-foreground">
+                <p className="text-xs font-semibold text-slate-600 dark:text-slate-300">
                   Add, edit, reorder, or duplicate questions.
                 </p>
               </div>
@@ -320,19 +271,19 @@ export const FaqConfigTabs: FC<FaqConfigTabsProps> = ({
                 type="button"
                 size="sm"
                 onClick={handleAddItem}
-                className="h-7.5 px-3 text-xs bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-xs flex items-center gap-1.5 shrink-0"
+                className="h-8 px-3.5 text-xs sm:text-sm bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl shadow-xs flex items-center gap-1.5 shrink-0"
               >
-                <Plus className="h-3.5 w-3.5" />
+                <Plus className="h-4 w-4 stroke-[2.5]" />
                 <span>Add Question</span>
               </Button>
             </div>
 
             {errors["items"] && (
-              <p className="text-[11px] text-destructive px-1">{errors["items"]}</p>
+              <p className="text-xs font-bold text-destructive px-1">{errors["items"]}</p>
             )}
 
             {/* Questions List */}
-            <div className="space-y-2 pt-1">
+            <div className="space-y-2.5 pt-1">
               {config.items.map((item, idx) => {
                 const isExpanded = expandedItemId === item.id;
                 const isNewlyAdded = newlyAddedId === item.id;
@@ -346,21 +297,21 @@ export const FaqConfigTabs: FC<FaqConfigTabsProps> = ({
                     className={cn(
                       "rounded-xl border bg-card transition-all duration-300",
                       isNewlyAdded
-                        ? "border-purple-500 ring-2 ring-purple-500/60 bg-purple-500/5 shadow-md"
+                        ? "border-purple-600 ring-2 ring-purple-600/60 bg-purple-50/30 dark:bg-purple-950/20 shadow-md"
                         : isExpanded
-                        ? "border-purple-500/40 shadow-xs"
-                        : "border-border/70 hover:border-border"
+                        ? "border-purple-500 shadow-xs"
+                        : "border-border hover:border-slate-400 dark:hover:border-slate-600"
                     )}
                   >
                     {/* Collapsed Header Bar */}
                     <div
                       className={cn(
-                        "flex items-center justify-between p-2.5 cursor-pointer select-none rounded-t-xl transition-colors",
-                        isExpanded ? "bg-muted/40 border-b border-border/50" : "hover:bg-muted/30"
+                        "flex items-center justify-between p-3 cursor-pointer select-none rounded-t-xl transition-colors",
+                        isExpanded ? "bg-muted/50 border-b border-border/60" : "hover:bg-muted/30"
                       )}
                       onClick={() => setExpandedItemId(isExpanded ? null : item.id)}
                     >
-                      <div className="flex items-center gap-2 min-w-0 flex-1 pr-2">
+                      <div className="flex items-center gap-2.5 min-w-0 flex-1 pr-2">
                         {/* Reorder Buttons */}
                         <div
                           className="flex flex-col shrink-0"
@@ -371,69 +322,64 @@ export const FaqConfigTabs: FC<FaqConfigTabsProps> = ({
                             aria-label="Move question up"
                             disabled={idx === 0}
                             onClick={() => handleMoveItem(idx, "up")}
-                            className="p-0.5 text-muted-foreground hover:text-foreground disabled:opacity-20 transition-colors"
+                            className="p-0.5 text-slate-500 hover:text-slate-900 dark:hover:text-white disabled:opacity-20 transition-colors"
                           >
-                            <ChevronUp className="h-3 w-3" />
+                            <ChevronUp className="h-3.5 w-3.5 stroke-[2.5]" />
                           </button>
                           <button
                             type="button"
                             aria-label="Move question down"
                             disabled={idx === config.items.length - 1}
                             onClick={() => handleMoveItem(idx, "down")}
-                            className="p-0.5 text-muted-foreground hover:text-foreground disabled:opacity-20 transition-colors"
+                            className="p-0.5 text-slate-500 hover:text-slate-900 dark:hover:text-white disabled:opacity-20 transition-colors"
                           >
-                            <ChevronDown className="h-3 w-3" />
+                            <ChevronDown className="h-3.5 w-3.5 stroke-[2.5]" />
                           </button>
                         </div>
 
-                        <span className="shrink-0 text-[10px] font-bold text-muted-foreground w-4">
+                        <span className="shrink-0 text-xs font-black text-slate-500 dark:text-slate-400 w-5">
                           #{idx + 1}
                         </span>
 
                         <div className="min-w-0 flex-1">
-                          <p className="text-xs font-semibold text-foreground truncate">
+                          <p className="text-xs sm:text-sm font-bold text-slate-950 dark:text-white truncate">
                             {item.question || "Untitled Question"}
                           </p>
-                          {item.category && item.category !== "All" && (
-                            <span className="inline-block mt-0.5 rounded bg-purple-500/10 px-1.5 py-0.2 text-[9px] font-medium text-purple-700 dark:text-purple-300">
-                              {item.category}
-                            </span>
-                          )}
                         </div>
                       </div>
 
                       {/* Header Actions */}
                       <div
-                        className="flex items-center gap-1 shrink-0"
+                        className="flex items-center gap-1.5 shrink-0"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <button
                           type="button"
                           aria-label="Duplicate question"
                           onClick={() => handleDuplicateItem(item)}
-                          className="h-6 w-6 grid place-items-center rounded text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
+                          className="h-7 w-7 grid place-items-center rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-muted transition-colors"
                         >
-                          <Copy className="h-3 w-3" />
+                          <Copy className="h-3.5 w-3.5 stroke-[2.5]" />
                         </button>
                         <button
                           type="button"
                           aria-label="Delete question"
                           disabled={config.items.length <= 1}
                           onClick={() => handleDeleteItem(item.id)}
-                          className="h-6 w-6 grid place-items-center rounded text-muted-foreground hover:text-destructive hover:bg-destructive/10 disabled:opacity-30 transition-colors"
+                          className="h-7 w-7 grid place-items-center rounded-lg text-slate-500 hover:text-destructive hover:bg-destructive/10 disabled:opacity-30 transition-colors"
                         >
-                          <Trash2 className="h-3 w-3" />
+                          <Trash2 className="h-3.5 w-3.5 stroke-[2.5]" />
                         </button>
                         <button
                           type="button"
                           aria-label={isExpanded ? "Collapse item" : "Expand item"}
                           onClick={() => setExpandedItemId(isExpanded ? null : item.id)}
-                          className="h-6 w-6 grid place-items-center rounded text-muted-foreground hover:text-foreground transition-colors ml-0.5"
+                          className="h-7 w-7 grid place-items-center rounded-lg text-slate-700 dark:text-slate-300 hover:bg-muted transition-colors ml-0.5"
                         >
                           {isExpanded ? (
-                            <ChevronUp className="h-3.5 w-3.5" />
+                            <ChevronUp className="h-4 w-4 stroke-[2.5]" />
                           ) : (
-                            <ChevronDown className="h-3.5 w-3.5" />
+                            <ChevronDown className="h-4 w-4 stroke-[2.5]" />
                           )}
                         </button>
                       </div>
@@ -441,11 +387,11 @@ export const FaqConfigTabs: FC<FaqConfigTabsProps> = ({
 
                     {/* Expanded Content Fields */}
                     {isExpanded && (
-                      <div className="p-3.5 space-y-3 bg-card/60 rounded-b-xl animate-in slide-in-from-top-1 duration-150">
-                        <div className="space-y-1">
+                      <div className="p-4 space-y-3.5 bg-card/70 rounded-b-xl animate-in slide-in-from-top-1 duration-150">
+                        <div className="space-y-1.5">
                           <Label
                             htmlFor={`faq-input-question-${item.id}`}
-                            className="text-[11px] font-semibold text-muted-foreground"
+                            className="text-xs font-bold text-slate-900 dark:text-slate-100"
                           >
                             Question *
                           </Label>
@@ -456,17 +402,17 @@ export const FaqConfigTabs: FC<FaqConfigTabsProps> = ({
                               handleUpdateItem(item.id, { question: e.target.value })
                             }
                             placeholder="e.g. What is your refund policy?"
-                            className="h-8.5 text-xs font-medium"
+                            className="h-9 text-xs sm:text-sm font-bold text-slate-950 dark:text-white"
                           />
                           {itemErrQuestion && (
-                            <p className="text-[10px] text-destructive">{itemErrQuestion}</p>
+                            <p className="text-xs font-bold text-destructive">{itemErrQuestion}</p>
                           )}
                         </div>
 
-                        <div className="space-y-1">
+                        <div className="space-y-1.5">
                           <Label
                             htmlFor={`faq-input-answer-${item.id}`}
-                            className="text-[11px] font-semibold text-muted-foreground"
+                            className="text-xs font-bold text-slate-900 dark:text-slate-100"
                           >
                             Answer *
                           </Label>
@@ -478,62 +424,11 @@ export const FaqConfigTabs: FC<FaqConfigTabsProps> = ({
                             }
                             placeholder="Provide a clear, helpful response..."
                             rows={3}
-                            className="text-xs resize-y"
+                            className="text-xs sm:text-sm font-medium text-slate-900 dark:text-slate-100 resize-y"
                           />
                           {itemErrAnswer && (
-                            <p className="text-[10px] text-destructive">{itemErrAnswer}</p>
+                            <p className="text-xs font-bold text-destructive">{itemErrAnswer}</p>
                           )}
-                        </div>
-
-                        {/* Optional Meta: Category & Badge */}
-                        <div className="grid grid-cols-2 gap-2.5 pt-1 border-t border-border/40">
-                          <div className="space-y-1">
-                            <Label className="text-[10px] font-medium text-muted-foreground">
-                              Category
-                            </Label>
-                            <Select
-                              value={item.category || "General"}
-                              onValueChange={(val) =>
-                                handleUpdateItem(item.id, {
-                                  category: val === "None" ? undefined : val,
-                                })
-                              }
-                            >
-                              <SelectTrigger className="h-7 text-xs bg-background">
-                                <SelectValue placeholder="Select category" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="None">None</SelectItem>
-                                {config.categories
-                                  .filter((c) => c !== "All")
-                                  .map((c) => (
-                                    <SelectItem key={c} value={c}>
-                                      {c}
-                                    </SelectItem>
-                                  ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-
-                          <div className="space-y-1">
-                            <Label
-                              htmlFor={`faq-input-badge-${item.id}`}
-                              className="text-[10px] font-medium text-muted-foreground"
-                            >
-                              Badge (optional)
-                            </Label>
-                            <Input
-                              id={`faq-input-badge-${item.id}`}
-                              value={item.badge || ""}
-                              onChange={(e) =>
-                                handleUpdateItem(item.id, {
-                                  badge: e.target.value || undefined,
-                                })
-                              }
-                              placeholder="e.g. Popular, New"
-                              className="h-7 text-xs"
-                            />
-                          </div>
                         </div>
                       </div>
                     )}
@@ -544,337 +439,180 @@ export const FaqConfigTabs: FC<FaqConfigTabsProps> = ({
           </div>
         </TabsContent>
 
-        {/* Tab 3: Layout (Structure, sizing, presets, colors & borders) */}
+        {/* Tab 3: Design (Columns in a stylish way, colors, radius, expand behavior) */}
         <TabsContent
-          value="layout"
-          className="m-0 flex-1 overflow-y-auto p-4 space-y-5 scrollbar-thin focus-visible:outline-hidden"
+          value="design"
+          className="m-0 flex-1 overflow-y-auto p-4 md:p-5 space-y-5 scrollbar-thin focus-visible:outline-hidden"
         >
-          {/* Quick Color Presets */}
-          <div className="rounded-xl border border-border/70 bg-card p-3.5 space-y-2.5 shadow-2xs">
-            <span className="text-xs font-bold text-foreground">Color Themes</span>
-            <div className="grid grid-cols-3 gap-2">
-              {COLOR_PRESETS.map((preset) => (
-                <button
-                  key={preset.name}
-                  type="button"
-                  onClick={() => handleApplyPreset(preset)}
-                  className="flex items-center gap-2 rounded-lg border border-border/60 p-2 text-left hover:border-border hover:bg-muted/40 transition-colors"
-                >
-                  <span
-                    className="h-4 w-4 rounded-full border border-black/10 shrink-0 shadow-2xs"
-                    style={{ backgroundColor: preset.accent }}
-                  />
-                  <span className="text-[11px] font-medium text-foreground truncate">
-                    {preset.name}
+          {/* ================= STYLISH COLUMNS SELECTOR ================= */}
+          <div className="rounded-xl border border-border bg-card p-4 space-y-3 shadow-2xs">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-extrabold text-slate-950 dark:text-white">
+                Columns Layout
+              </span>
+              <span className="text-xs font-bold text-purple-600 bg-purple-50 dark:bg-purple-950/40 px-2 py-0.5 rounded-md">
+                {config.columns === 2 ? "2 Columns Active" : "1 Column Active"}
+              </span>
+            </div>
+
+            {/* Stylish Visual Cards for 1 Column vs 2 Columns */}
+            <div className="grid grid-cols-2 gap-3 pt-1">
+              {/* Option 1: Single Column */}
+              <button
+                type="button"
+                onClick={() => onChange("columns", 1)}
+                className={cn(
+                  "relative flex flex-col items-center p-3.5 rounded-xl border text-left transition-all duration-200 cursor-pointer group",
+                  config.columns === 1
+                    ? "border-purple-600 bg-purple-50/50 dark:bg-purple-950/30 ring-2 ring-purple-600 shadow-sm"
+                    : "border-border bg-card hover:border-slate-400 hover:bg-muted/40"
+                )}
+              >
+                {config.columns === 1 && (
+                  <span className="absolute top-2 right-2 flex h-5 w-5 items-center justify-center rounded-full bg-purple-600 text-white shadow-xs">
+                    <Check className="h-3 w-3 stroke-[3]" />
                   </span>
-                </button>
-              ))}
-            </div>
-          </div>
+                )}
 
-          {/* Sizing & Columns */}
-          <div className="rounded-xl border border-border/70 bg-card p-3.5 space-y-3.5 shadow-2xs">
-            <span className="text-xs font-bold text-foreground">Layout & Grid</span>
+                {/* Stylish Miniature Visual Icon for 1 Column */}
+                <div className="w-full h-16 bg-muted/60 dark:bg-slate-800 rounded-lg p-2 mb-2.5 flex flex-col justify-around border border-border/50 group-hover:scale-[1.02] transition-transform">
+                  <div className="h-2 w-full bg-purple-600 rounded-sm" />
+                  <div className="h-2 w-full bg-slate-300 dark:bg-slate-600 rounded-sm" />
+                  <div className="h-2 w-full bg-slate-300 dark:bg-slate-600 rounded-sm" />
+                </div>
 
-            <div className="space-y-2">
-              <Label className="text-[11px] font-semibold text-muted-foreground">
-                Columns Display
-              </Label>
-              <div className="grid grid-cols-2 gap-2">
-                <Button
-                  type="button"
-                  variant={config.columns === 1 ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => onChange("columns", 1)}
-                  className={cn(
-                    "h-8 text-xs font-medium justify-center gap-1.5",
-                    config.columns === 1 && "bg-purple-600 hover:bg-purple-700 text-white"
-                  )}
-                >
-                  <Columns className="h-3.5 w-3.5" />
+                <span className="text-xs sm:text-sm font-black text-slate-950 dark:text-white">
                   1 Column
-                </Button>
-                <Button
-                  type="button"
-                  variant={config.columns === 2 ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => onChange("columns", 2)}
-                  className={cn(
-                    "h-8 text-xs font-medium justify-center gap-1.5",
-                    config.columns === 2 && "bg-purple-600 hover:bg-purple-700 text-white"
-                  )}
-                >
-                  <Grid className="h-3.5 w-3.5" />
+                </span>
+                <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-300 mt-0.5 text-center">
+                  Classic vertical list
+                </span>
+              </button>
+
+              {/* Option 2: Two Columns */}
+              <button
+                type="button"
+                onClick={() => onChange("columns", 2)}
+                className={cn(
+                  "relative flex flex-col items-center p-3.5 rounded-xl border text-left transition-all duration-200 cursor-pointer group",
+                  config.columns === 2
+                    ? "border-purple-600 bg-purple-50/50 dark:bg-purple-950/30 ring-2 ring-purple-600 shadow-sm"
+                    : "border-border bg-card hover:border-slate-400 hover:bg-muted/40"
+                )}
+              >
+                {config.columns === 2 && (
+                  <span className="absolute top-2 right-2 flex h-5 w-5 items-center justify-center rounded-full bg-purple-600 text-white shadow-xs">
+                    <Check className="h-3 w-3 stroke-[3]" />
+                  </span>
+                )}
+
+                {/* Stylish Miniature Visual Icon for 2 Columns */}
+                <div className="w-full h-16 bg-muted/60 dark:bg-slate-800 rounded-lg p-2 mb-2.5 grid grid-cols-2 gap-1.5 border border-border/50 group-hover:scale-[1.02] transition-transform">
+                  <div className="flex flex-col justify-around">
+                    <div className="h-2 w-full bg-purple-600 rounded-sm" />
+                    <div className="h-2 w-full bg-slate-300 dark:bg-slate-600 rounded-sm" />
+                  </div>
+                  <div className="flex flex-col justify-around">
+                    <div className="h-2 w-full bg-purple-600 rounded-sm" />
+                    <div className="h-2 w-full bg-slate-300 dark:bg-slate-600 rounded-sm" />
+                  </div>
+                </div>
+
+                <span className="text-xs sm:text-sm font-black text-slate-950 dark:text-white">
                   2 Columns
-                </Button>
-              </div>
+                </span>
+                <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-300 mt-0.5 text-center">
+                  Side-by-side grid
+                </span>
+              </button>
             </div>
 
-            <div className="space-y-2">
+            {/* Container Max Width */}
+            <div className="pt-2 space-y-2">
               <div className="flex items-center justify-between">
-                <Label className="text-[11px] font-semibold text-muted-foreground">
-                  Max Container Width
+                <Label className="text-xs font-bold text-slate-900 dark:text-slate-100">
+                  Widget Width
                 </Label>
-                <span className="text-xs font-bold font-mono text-foreground">
+                <span className="text-xs font-black font-mono text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/50 px-2 py-0.5 rounded">
                   {config.maxWidth}px
                 </span>
               </div>
               <Slider
                 value={[config.maxWidth]}
-                min={320}
+                min={400}
                 max={1100}
                 step={20}
                 onValueChange={([val]) => val && onChange("maxWidth", val)}
               />
             </div>
-
-            <div className="space-y-2">
-              <Label className="text-[11px] font-semibold text-muted-foreground">
-                Content Alignment
-              </Label>
-              <div className="grid grid-cols-2 gap-2">
-                <Button
-                  type="button"
-                  variant={config.alignment === "left" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => onChange("alignment", "left")}
-                  className={cn(
-                    "h-8 text-xs font-medium justify-center gap-1.5",
-                    config.alignment === "left" && "bg-purple-600 hover:bg-purple-700 text-white"
-                  )}
-                >
-                  <AlignLeft className="h-3.5 w-3.5" />
-                  Left
-                </Button>
-                <Button
-                  type="button"
-                  variant={config.alignment === "center" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => onChange("alignment", "center")}
-                  className={cn(
-                    "h-8 text-xs font-medium justify-center gap-1.5",
-                    config.alignment === "center" && "bg-purple-600 hover:bg-purple-700 text-white"
-                  )}
-                >
-                  <AlignCenter className="h-3.5 w-3.5" />
-                  Center
-                </Button>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-[11px] font-semibold text-muted-foreground">
-                Content Density
-              </Label>
-              <div className="grid grid-cols-3 gap-1.5">
-                {(["compact", "comfortable", "spacious"] as const).map((density) => (
-                  <Button
-                    key={density}
-                    type="button"
-                    variant={config.density === density ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => onChange("density", density)}
-                    className={cn(
-                      "h-7 text-[11px] font-medium capitalize",
-                      config.density === density &&
-                        "bg-purple-600 hover:bg-purple-700 text-white"
-                    )}
-                  >
-                    {density}
-                  </Button>
-                ))}
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label className="text-[11px] font-semibold text-muted-foreground">
-                  Item Spacing / Gap
-                </Label>
-                <span className="text-xs font-mono font-bold text-foreground">
-                  {config.itemGap}px
-                </span>
-              </div>
-              <Slider
-                value={[config.itemGap]}
-                min={0}
-                max={24}
-                step={2}
-                onValueChange={([val]) => val !== undefined && onChange("itemGap", val)}
-              />
-            </div>
           </div>
 
-          {/* Color Details */}
-          <div className="rounded-xl border border-border/70 bg-card p-3.5 space-y-3 shadow-2xs">
-            <span className="text-xs font-bold text-foreground">Color Customization</span>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <Label className="text-[10px] font-medium text-muted-foreground">Accent Color</Label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="color"
-                    value={config.accentColor}
-                    onChange={(e) => onChange("accentColor", e.target.value)}
-                    className="h-7 w-7 rounded cursor-pointer border border-border shrink-0"
-                  />
-                  <Input
-                    value={config.accentColor}
-                    onChange={(e) => onChange("accentColor", e.target.value)}
-                    className="h-7 text-xs font-mono"
-                  />
-                </div>
-              </div>
+          {/* ================= COLOR THEMES ================= */}
+          <div className="rounded-xl border border-border bg-card p-4 space-y-3.5 shadow-2xs">
+            <span className="text-sm font-extrabold text-slate-950 dark:text-white">
+              Color Themes
+            </span>
 
-              <div className="space-y-1">
-                <Label className="text-[10px] font-medium text-muted-foreground">Card Background</Label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="color"
-                    value={config.cardBgColor}
-                    onChange={(e) => onChange("cardBgColor", e.target.value)}
-                    className="h-7 w-7 rounded cursor-pointer border border-border shrink-0"
-                  />
-                  <Input
-                    value={config.cardBgColor}
-                    onChange={(e) => onChange("cardBgColor", e.target.value)}
-                    className="h-7 text-xs font-mono"
-                  />
-                </div>
-              </div>
+            {/* Modern circular color swatches */}
+            <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+              {COLOR_SWATCHES.map((preset) => {
+                const isActive = config.accentColor === preset.accent;
+                return (
+                  <button
+                    key={preset.name}
+                    type="button"
+                    onClick={() => handleApplyPreset(preset)}
+                    className={cn(
+                      "flex flex-col items-center gap-1.5 p-2 rounded-xl border transition-all text-center group",
+                      isActive
+                        ? "border-purple-600 bg-purple-50/60 dark:bg-purple-950/40 ring-1 ring-purple-600"
+                        : "border-border hover:bg-muted/50"
+                    )}
+                  >
+                    <span
+                      className="h-6 w-6 rounded-full border border-black/10 shadow-sm shrink-0 flex items-center justify-center"
+                      style={{ backgroundColor: preset.accent }}
+                    >
+                      {isActive && <Check className="h-3 w-3 text-white stroke-[3]" />}
+                    </span>
+                    <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200 truncate w-full">
+                      {preset.name.split(" ")[0]}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
 
-              <div className="space-y-1">
-                <Label className="text-[10px] font-medium text-muted-foreground">Question Color</Label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="color"
-                    value={config.questionColor}
-                    onChange={(e) => onChange("questionColor", e.target.value)}
-                    className="h-7 w-7 rounded cursor-pointer border border-border shrink-0"
-                  />
-                  <Input
-                    value={config.questionColor}
-                    onChange={(e) => onChange("questionColor", e.target.value)}
-                    className="h-7 text-xs font-mono"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-1">
-                <Label className="text-[10px] font-medium text-muted-foreground">Answer Color</Label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="color"
-                    value={config.answerColor}
-                    onChange={(e) => onChange("answerColor", e.target.value)}
-                    className="h-7 w-7 rounded cursor-pointer border border-border shrink-0"
-                  />
-                  <Input
-                    value={config.answerColor}
-                    onChange={(e) => onChange("answerColor", e.target.value)}
-                    className="h-7 text-xs font-mono"
-                  />
-                </div>
+            {/* Custom Accent Color */}
+            <div className="pt-2 flex items-center justify-between">
+              <Label className="text-xs font-bold text-slate-900 dark:text-slate-100">
+                Custom Accent Color
+              </Label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={config.accentColor}
+                  onChange={(e) => onChange("accentColor", e.target.value)}
+                  className="h-8 w-8 rounded-lg cursor-pointer border border-border shrink-0 shadow-2xs"
+                />
+                <Input
+                  value={config.accentColor}
+                  onChange={(e) => onChange("accentColor", e.target.value)}
+                  className="h-8 w-24 text-xs font-mono font-bold"
+                />
               </div>
             </div>
           </div>
 
-          {/* Borders & Shadows */}
-          <div className="rounded-xl border border-border/70 bg-card p-3.5 space-y-3.5 shadow-2xs">
-            <span className="text-xs font-bold text-foreground">Borders & Styling</span>
+          {/* ================= ACCORDION BEHAVIOR & SEARCH ================= */}
+          <div className="rounded-xl border border-border bg-card p-4 space-y-3.5 shadow-2xs">
+            <span className="text-sm font-extrabold text-slate-950 dark:text-white">
+              Accordion Settings
+            </span>
 
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label className="text-[11px] font-semibold text-muted-foreground">
-                  Corner Radius
-                </Label>
-                <span className="text-xs font-mono font-bold text-foreground">
-                  {config.borderRadius}px
-                </span>
-              </div>
-              <Slider
-                value={[config.borderRadius]}
-                min={0}
-                max={28}
-                step={2}
-                onValueChange={([val]) => val !== undefined && onChange("borderRadius", val)}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-[11px] font-semibold text-muted-foreground">
-                Expand Icon Style
-              </Label>
-              <div className="grid grid-cols-3 gap-1.5">
-                {(["chevron", "plus-minus", "arrow"] as const).map((st) => (
-                  <Button
-                    key={st}
-                    type="button"
-                    variant={config.iconStyle === st ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => onChange("iconStyle", st)}
-                    className={cn(
-                      "h-7 text-[11px] font-medium capitalize",
-                      config.iconStyle === st &&
-                        "bg-purple-600 hover:bg-purple-700 text-white"
-                    )}
-                  >
-                    {st}
-                  </Button>
-                ))}
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-[11px] font-semibold text-muted-foreground">
-                Card Shadow
-              </Label>
-              <div className="grid grid-cols-3 gap-1.5">
-                {(["none", "subtle", "medium"] as const).map((sh) => (
-                  <Button
-                    key={sh}
-                    type="button"
-                    variant={config.shadow === sh ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => onChange("shadow", sh)}
-                    className={cn(
-                      "h-7 text-[11px] font-medium capitalize",
-                      config.shadow === sh && "bg-purple-600 hover:bg-purple-700 text-white"
-                    )}
-                  >
-                    {sh}
-                  </Button>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between pt-1 border-t border-border/40">
-              <Label
-                htmlFor="faq-outer-border"
-                className="text-[11px] font-semibold text-muted-foreground"
-              >
-                Show Card Border
-              </Label>
-              <Switch
-                id="faq-outer-border"
-                checked={config.showOuterBorder}
-                onCheckedChange={(checked) => onChange("showOuterBorder", checked)}
-              />
-            </div>
-          </div>
-        </TabsContent>
-
-        {/* Tab 4: Settings (Accordion behavior, Search, Categories, Header toggle) */}
-        <TabsContent
-          value="settings"
-          className="m-0 flex-1 overflow-y-auto p-4 space-y-5 scrollbar-thin focus-visible:outline-hidden"
-        >
-          {/* Accordion Behavior */}
-          <div className="rounded-xl border border-border/70 bg-card p-3.5 space-y-3.5 shadow-2xs">
-            <span className="text-xs font-bold text-foreground">Accordion Behavior</span>
-
-            <div className="space-y-2">
-              <Label className="text-[11px] font-semibold text-muted-foreground">
+            {/* Expand Mode */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-bold text-slate-900 dark:text-slate-100">
                 Expand Mode
               </Label>
               <div className="grid grid-cols-2 gap-2">
@@ -884,7 +622,7 @@ export const FaqConfigTabs: FC<FaqConfigTabsProps> = ({
                   size="sm"
                   onClick={() => onChange("accordionMode", "single")}
                   className={cn(
-                    "h-8 text-xs font-medium justify-center",
+                    "h-8.5 text-xs font-bold justify-center",
                     config.accordionMode === "single" &&
                       "bg-purple-600 hover:bg-purple-700 text-white"
                   )}
@@ -897,7 +635,7 @@ export const FaqConfigTabs: FC<FaqConfigTabsProps> = ({
                   size="sm"
                   onClick={() => onChange("accordionMode", "multiple")}
                   className={cn(
-                    "h-8 text-xs font-medium justify-center",
+                    "h-8.5 text-xs font-bold justify-center",
                     config.accordionMode === "multiple" &&
                       "bg-purple-600 hover:bg-purple-700 text-white"
                   )}
@@ -907,10 +645,11 @@ export const FaqConfigTabs: FC<FaqConfigTabsProps> = ({
               </div>
             </div>
 
+            {/* Open First Item */}
             <div className="flex items-center justify-between pt-1">
               <Label
                 htmlFor="faq-open-first"
-                className="text-[11px] font-semibold text-muted-foreground"
+                className="text-xs font-bold text-slate-900 dark:text-slate-100"
               >
                 Open First Question by Default
               </Label>
@@ -921,163 +660,62 @@ export const FaqConfigTabs: FC<FaqConfigTabsProps> = ({
               />
             </div>
 
-            <div className="flex items-center justify-between pt-1 border-t border-border/40">
-              <Label
-                htmlFor="faq-collapsible"
-                className="text-[11px] font-semibold text-muted-foreground"
-              >
-                Allow Collapsing All Questions
-              </Label>
-              <Switch
-                id="faq-collapsible"
-                checked={config.collapsible}
-                onCheckedChange={(checked) => onChange("collapsible", checked)}
-              />
-            </div>
-          </div>
-
-          {/* Search Bar Settings */}
-          <div className="rounded-xl border border-border/70 bg-card p-3.5 space-y-3.5 shadow-2xs">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Search className="h-4 w-4 text-purple-600" />
-                <span className="text-xs font-bold text-foreground">Live Search Filter</span>
+            {/* Instant Search Bar */}
+            <div className="flex items-center justify-between pt-2 border-t border-border/60">
+              <div>
+                <Label
+                  htmlFor="faq-search-toggle"
+                  className="text-xs font-bold text-slate-900 dark:text-slate-100"
+                >
+                  Live Search Bar
+                </Label>
+                <p className="text-[11px] font-semibold text-slate-600 dark:text-slate-300">
+                  Allow visitors to instantly filter questions
+                </p>
               </div>
               <Switch
+                id="faq-search-toggle"
                 checked={config.enableSearch}
                 onCheckedChange={(checked) => onChange("enableSearch", checked)}
               />
             </div>
 
-            {config.enableSearch && (
-              <div className="space-y-3 pt-1 border-t border-border/50">
-                <div className="space-y-1">
-                  <Label
-                    htmlFor="faq-search-holder"
-                    className="text-[11px] font-semibold text-muted-foreground"
-                  >
-                    Search Placeholder
-                  </Label>
-                  <Input
-                    id="faq-search-holder"
-                    value={config.searchPlaceholder}
-                    onChange={(e) => onChange("searchPlaceholder", e.target.value)}
-                    placeholder="Search questions..."
-                    className="h-8 text-xs"
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <Label
-                    htmlFor="faq-case-search"
-                    className="text-[11px] font-semibold text-muted-foreground"
-                  >
-                    Case-Insensitive Search
-                  </Label>
-                  <Switch
-                    id="faq-case-search"
-                    checked={config.caseInsensitiveSearch}
-                    onCheckedChange={(checked) => onChange("caseInsensitiveSearch", checked)}
-                  />
-                </div>
+            {/* Corner Radius */}
+            <div className="pt-2 border-t border-border/60 space-y-2">
+              <div className="flex items-center justify-between">
+                <Label className="text-xs font-bold text-slate-900 dark:text-slate-100">
+                  Corner Radius
+                </Label>
+                <span className="text-xs font-black font-mono text-purple-700 dark:text-purple-300">
+                  {config.borderRadius}px
+                </span>
               </div>
-            )}
-          </div>
-
-          {/* Category Filters Settings */}
-          <div className="rounded-xl border border-border/70 bg-card p-3.5 space-y-3.5 shadow-2xs">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Tag className="h-4 w-4 text-purple-600" />
-                <span className="text-xs font-bold text-foreground">Category Filter Tabs</span>
-              </div>
-              <Switch
-                checked={config.showCategoryFilters}
-                onCheckedChange={(checked) => onChange("showCategoryFilters", checked)}
-              />
-            </div>
-
-            {config.showCategoryFilters && (
-              <div className="space-y-3 pt-1 border-t border-border/50">
-                <div className="space-y-1">
-                  <Label className="text-[11px] font-semibold text-muted-foreground">
-                    Available Categories
-                  </Label>
-                  <div className="flex flex-wrap gap-1.5 pt-1">
-                    {config.categories.map((c) => (
-                      <span
-                        key={c}
-                        className="inline-flex items-center gap-1 rounded-md bg-purple-500/10 px-2 py-0.5 text-xs font-semibold text-purple-700 dark:text-purple-300"
-                      >
-                        {c}
-                        {c !== "All" && config.categories.length > 2 && (
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteCategory(c)}
-                            className="text-purple-500 hover:text-destructive transition-colors ml-0.5"
-                          >
-                            ×
-                          </button>
-                        )}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 pt-1">
-                  <Input
-                    value={newCategoryName}
-                    onChange={(e) => setNewCategoryName(e.target.value)}
-                    placeholder="New category..."
-                    className="h-7.5 text-xs"
-                  />
-                  <Button
-                    type="button"
-                    size="sm"
-                    onClick={handleAddCategory}
-                    className="h-7.5 text-xs bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg shrink-0"
-                  >
-                    Add
-                  </Button>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Header Display */}
-          <div className="rounded-xl border border-border/70 bg-card p-3.5 space-y-3 shadow-2xs">
-            <span className="text-xs font-bold text-foreground">Header Visibility</span>
-            <div className="flex items-center justify-between">
-              <Label
-                htmlFor="faq-show-head"
-                className="text-[11px] font-semibold text-muted-foreground"
-              >
-                Show Main Heading
-              </Label>
-              <Switch
-                id="faq-show-head"
-                checked={config.showHeading}
-                onCheckedChange={(checked) => onChange("showHeading", checked)}
+              <Slider
+                value={[config.borderRadius]}
+                min={0}
+                max={24}
+                step={2}
+                onValueChange={([val]) => val !== undefined && onChange("borderRadius", val)}
               />
             </div>
           </div>
         </TabsContent>
 
         {/* Guided Step Navigation Bar at Bottom */}
-        <div className="border-t border-border/70 bg-card p-3 flex items-center justify-between gap-2 shrink-0">
+        <div className="border-t border-border bg-card p-3.5 flex items-center justify-between gap-2 shrink-0">
           {activeTab === "templates" && (
             <div className="flex items-center justify-between w-full">
-              <span className="text-[11px] text-muted-foreground font-medium">
-                Step 1 of 4: Choose Template
+              <span className="text-xs font-bold text-slate-600 dark:text-slate-300">
+                Step 1 of 3: Choose Template
               </span>
               <Button
                 type="button"
                 size="sm"
                 onClick={() => setActiveTab("content")}
-                className="h-8 px-3 text-xs bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-xs flex items-center gap-1.5"
+                className="h-8.5 px-4 text-xs sm:text-sm bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl shadow-xs flex items-center gap-1.5"
               >
-                <span>Add Content</span>
-                <ArrowRight className="h-3.5 w-3.5" />
+                <span>Edit Content</span>
+                <ArrowRight className="h-4 w-4 stroke-[2.5]" />
               </Button>
             </div>
           )}
@@ -1089,65 +727,41 @@ export const FaqConfigTabs: FC<FaqConfigTabsProps> = ({
                 variant="outline"
                 size="sm"
                 onClick={() => setActiveTab("templates")}
-                className="h-8 text-xs font-medium rounded-lg flex items-center gap-1"
+                className="h-8.5 text-xs sm:text-sm font-bold rounded-xl flex items-center gap-1"
               >
-                <ArrowLeft className="h-3.5 w-3.5" />
+                <ArrowLeft className="h-4 w-4 stroke-[2.5]" />
                 <span>Templates</span>
               </Button>
               <Button
                 type="button"
                 size="sm"
-                onClick={() => setActiveTab("layout")}
-                className="h-8 px-3 text-xs bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-xs flex items-center gap-1.5"
+                onClick={() => setActiveTab("design")}
+                className="h-8.5 px-4 text-xs sm:text-sm bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl shadow-xs flex items-center gap-1.5"
               >
-                <span>Customize Layout</span>
-                <ArrowRight className="h-3.5 w-3.5" />
+                <span>Customize Design</span>
+                <ArrowRight className="h-4 w-4 stroke-[2.5]" />
               </Button>
             </div>
           )}
 
-          {activeTab === "layout" && (
+          {activeTab === "design" && (
             <div className="flex items-center justify-between w-full">
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
                 onClick={() => setActiveTab("content")}
-                className="h-8 text-xs font-medium rounded-lg flex items-center gap-1"
+                className="h-8.5 text-xs sm:text-sm font-bold rounded-xl flex items-center gap-1"
               >
-                <ArrowLeft className="h-3.5 w-3.5" />
+                <ArrowLeft className="h-4 w-4 stroke-[2.5]" />
                 <span>Content</span>
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                onClick={() => setActiveTab("settings")}
-                className="h-8 px-3 text-xs bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-xs flex items-center gap-1.5"
-              >
-                <span>Adjust Settings</span>
-                <ArrowRight className="h-3.5 w-3.5" />
-              </Button>
-            </div>
-          )}
-
-          {activeTab === "settings" && (
-            <div className="flex items-center justify-between w-full">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => setActiveTab("layout")}
-                className="h-8 text-xs font-medium rounded-lg flex items-center gap-1"
-              >
-                <ArrowLeft className="h-3.5 w-3.5" />
-                <span>Layout</span>
               </Button>
               <Button
                 type="button"
                 size="sm"
                 onClick={onPublish}
                 disabled={isPublishing}
-                className="h-8 px-4 text-xs bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-xs"
+                className="h-8.5 px-5 text-xs sm:text-sm bg-purple-600 hover:bg-purple-700 text-white font-extrabold rounded-xl shadow-xs"
               >
                 {isPublishing ? "Publishing..." : "Publish FAQ"}
               </Button>
