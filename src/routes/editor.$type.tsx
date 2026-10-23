@@ -20,6 +20,8 @@ import { AnnouncementEditor } from "@/components/announcement/AnnouncementEditor
 import { DEFAULT_ANNOUNCEMENT_CONFIG, type AnnouncementBarConfig } from "@/lib/announcement/types";
 import { PopupEditor } from "@/components/popup/PopupEditor";
 import { DEFAULT_POPUP_CONFIG, type PopupWidgetConfig } from "@/lib/popup/types";
+import { FaqEditor } from "@/components/faq/FaqEditor";
+import { migrateFaqConfig, type FaqWidgetConfig } from "@/lib/faq/types";
 
 export const Route = createFileRoute("/editor/$type")({
   validateSearch: (s: Record<string, unknown>): { id?: string | undefined } => ({ id: typeof s["id"] === "string" ? (s["id"] as string) : undefined }),
@@ -109,6 +111,20 @@ function Editor() {
         initialConfig={popupConfig}
         widgetId={widgetId}
         widgetName={saved?.name || name || "Popup Widget"}
+        isExisting={Boolean(id)}
+      />
+    );
+  }
+
+  // Use the dedicated FAQ Accordion Builder for FAQ
+  if (type === "faq" || type === "faq-accordion") {
+    const saved = id ? loadSaved().find((w) => w.id === id) : undefined;
+    const faqConfig: FaqWidgetConfig = migrateFaqConfig(saved?.config as any);
+    return (
+      <FaqEditor
+        initialConfig={faqConfig}
+        widgetId={widgetId}
+        widgetName={saved?.name || name || "FAQ Accordion"}
         isExisting={Boolean(id)}
       />
     );

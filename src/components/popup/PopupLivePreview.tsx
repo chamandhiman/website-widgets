@@ -360,7 +360,7 @@ export const PopupLivePreview: FC<PopupLivePreviewProps> = ({
                           src={parseVideoUrl(config.videoUrl).embedUrl}
                           title="Video preview"
                           className="h-full w-full border-0"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; presentation"
                         />
                       ) : (
                         <div className="flex flex-col items-center gap-2 text-white/60">

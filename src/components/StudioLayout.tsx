@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { StudioTopNav } from "./StudioTopNav";
 
 const NAV = [
   {
@@ -163,19 +164,22 @@ export function StudioLayout({ children }: { children: ReactNode }) {
           </aside>
         </div>
       )}
-
       {/* ================= MAIN CONTENT ================= */}
       <div className="relative z-1 flex min-w-0 flex-1 flex-col">
-        <header className="flex h-14 items-center gap-3 border-b border-border/70 bg-card/80 backdrop-blur-md px-4 md:hidden">
-          <button
-            onClick={() => setOpen(true)}
-            aria-label="Open menu"
-            className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
-          >
-            <Menu className="h-5 w-5" />
-          </button>
-          {brand}
-        </header>
+        {!path.startsWith("/editor") ? (
+          <StudioTopNav onOpenMobileNav={() => setOpen(true)} />
+        ) : (
+          <header className="flex h-14 items-center gap-3 border-b border-border/70 bg-card/80 backdrop-blur-md px-4 md:hidden">
+            <button
+              onClick={() => setOpen(true)}
+              aria-label="Open menu"
+              className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+            {brand}
+          </header>
+        )}
         <main className="flex-1">{children}</main>
       </div>
     </div>

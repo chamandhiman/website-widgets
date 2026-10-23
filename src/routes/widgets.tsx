@@ -1,6 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Sparkles } from "lucide-react";
-import { PageHeader } from "@/components/StudioLayout";
 import { WidgetCatalog } from "@/components/WidgetCatalog";
 
 export const Route = createFileRoute("/widgets")({
@@ -13,17 +11,7 @@ export const Route = createFileRoute("/widgets")({
     ],
   }),
   component: () => (
-    <div className="mx-auto max-w-7xl p-5 md:p-8 space-y-6">
-      <div>
-        <div className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-purple-500/15 via-indigo-500/10 to-pink-500/15 px-3 py-1 text-xs font-bold text-purple-700 dark:text-purple-300 border border-purple-500/20 mb-2">
-          <Sparkles className="h-3.5 w-3.5 text-purple-500" />
-          <span>Full Widget Catalog</span>
-        </div>
-        <PageHeader
-          title="All Widgets"
-          description="Pick a widget to customize with live real-time preview and install on your website."
-        />
-      </div>
+    <div className="mx-auto w-full max-w-[1600px] p-4 sm:p-6 lg:p-8">
       <WidgetCatalog />
     </div>
   ),

@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/StudioLayout";
 import { WIDGETS, deleteWidget, loadSaved, saveWidget, type SavedWidget } from "@/lib/widgets";
 import { maskPhoneNumber } from "@/lib/whatsapp/phone";
+import { cn } from "@/lib/utils";
+import { WhatsAppIcon } from "@/components/whatsapp/WhatsAppLivePreview";
 
 export const Route = createFileRoute("/my-widgets")({
   head: () => ({
@@ -70,11 +72,15 @@ function MyWidgets() {
               ? "bg-gradient-to-tr from-amber-400 to-orange-500 text-white shadow-xs"
               : "bg-gradient-to-tr from-blue-600 to-indigo-600 text-white shadow-xs";
 
-            const maskedPhone = isWhatsApp && w.config?.phone
-              ? maskPhoneNumber(String(w.config.phone), String(w.config.callingCode || "91"))
+            const cfg = w.config || {};
+            const phoneVal = cfg["phone"];
+            const callingCodeVal = cfg["callingCode"];
+            const maskedPhone = isWhatsApp && phoneVal
+              ? maskPhoneNumber(String(phoneVal), String(callingCodeVal || "91"))
               : null;
-            const announcementSnippet = isAnnouncement && (w.config?.text || w.config?.message)
-              ? String(w.config.text || w.config.message).slice(0, 36) + (String(w.config.text || w.config.message).length > 36 ? "..." : "")
+            const textVal = cfg["text"] || cfg["message"];
+            const announcementSnippet = isAnnouncement && textVal
+              ? String(textVal).slice(0, 36) + (String(textVal).length > 36 ? "..." : "")
               : null;
 
             return (
