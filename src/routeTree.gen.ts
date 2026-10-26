@@ -10,7 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IntegrationsRouteImport } from './routes/integrations'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as MyWidgetsRouteImport } from './routes/my-widgets'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as TemplatesRouteImport } from './routes/templates'
@@ -22,9 +24,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IntegrationsRoute = IntegrationsRouteImport.update({
   id: '/integrations',
   path: '/integrations',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MyWidgetsRoute = MyWidgetsRouteImport.update({
@@ -55,7 +67,9 @@ const EditorTypeRoute = EditorTypeRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
   '/integrations': typeof IntegrationsRoute
+  '/login': typeof LoginRoute
   '/my-widgets': typeof MyWidgetsRoute
   '/settings': typeof SettingsRoute
   '/templates': typeof TemplatesRoute
@@ -64,7 +78,9 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
   '/integrations': typeof IntegrationsRoute
+  '/login': typeof LoginRoute
   '/my-widgets': typeof MyWidgetsRoute
   '/settings': typeof SettingsRoute
   '/templates': typeof TemplatesRoute
@@ -74,7 +90,9 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
   '/integrations': typeof IntegrationsRoute
+  '/login': typeof LoginRoute
   '/my-widgets': typeof MyWidgetsRoute
   '/settings': typeof SettingsRoute
   '/templates': typeof TemplatesRoute
@@ -85,7 +103,9 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/dashboard'
     | '/integrations'
+    | '/login'
     | '/my-widgets'
     | '/settings'
     | '/templates'
@@ -94,7 +114,9 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/dashboard'
     | '/integrations'
+    | '/login'
     | '/my-widgets'
     | '/settings'
     | '/templates'
@@ -103,7 +125,9 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/dashboard'
     | '/integrations'
+    | '/login'
     | '/my-widgets'
     | '/settings'
     | '/templates'
@@ -113,7 +137,9 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DashboardRoute: typeof DashboardRoute
   IntegrationsRoute: typeof IntegrationsRoute
+  LoginRoute: typeof LoginRoute
   MyWidgetsRoute: typeof MyWidgetsRoute
   SettingsRoute: typeof SettingsRoute
   TemplatesRoute: typeof TemplatesRoute
@@ -130,11 +156,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/integrations': {
       id: '/integrations'
       path: '/integrations'
       fullPath: '/integrations'
       preLoaderRoute: typeof IntegrationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/my-widgets': {
@@ -177,7 +217,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DashboardRoute: DashboardRoute,
   IntegrationsRoute: IntegrationsRoute,
+  LoginRoute: LoginRoute,
   MyWidgetsRoute: MyWidgetsRoute,
   SettingsRoute: SettingsRoute,
   TemplatesRoute: TemplatesRoute,

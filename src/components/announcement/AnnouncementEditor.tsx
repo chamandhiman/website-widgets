@@ -10,7 +10,7 @@ import type { AnnouncementBarConfig } from "@/lib/announcement/types";
 import { validateAnnouncementConfig } from "@/lib/announcement/validation";
 import type { TemplateDefinition } from "@/lib/announcement/templates";
 import { saveWidget } from "@/lib/widgets";
-
+import { WebsiteUrlField, normaliseWebsiteUrl } from "@/components/editor/WebsiteUrlField";
 interface AnnouncementEditorProps {
   initialConfig: AnnouncementBarConfig;
   widgetId: string;
@@ -31,6 +31,7 @@ export function AnnouncementEditor({
   const [installModalOpen, setInstallModalOpen] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isPublishing, setIsPublishing] = useState(false);
+  const [website, setWebsite] = useState("");
 
   const updateConfig = <K extends keyof AnnouncementBarConfig>(
     key: K,
@@ -83,6 +84,7 @@ export function AnnouncementEditor({
         name: widgetName || "Announcement Bar",
         config: config as any,
         updatedAt: Date.now(),
+        website: normaliseWebsiteUrl(website),
       });
 
       if (typeof window !== "undefined") {
@@ -140,6 +142,10 @@ export function AnnouncementEditor({
         onInstall={handleInstallClick}
         onPublish={handlePublish}
       />
+      {/* Website URL field placed under header */}
+      <div className="px-6 py-3 border-b">
+        <WebsiteUrlField value={website} onChange={setWebsite} />
+      </div>
 
       {/* ================= MAIN TWO-COLUMN LAYOUT ================= */}
       <main className="flex-1 p-4 md:p-6 lg:p-8">

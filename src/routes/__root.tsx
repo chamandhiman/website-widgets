@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 
 import { StudioLayout } from "@/components/StudioLayout";
 import { Toaster } from "@/components/ui/sonner";
+import { AuthProvider } from "@/lib/auth";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
@@ -123,12 +124,14 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
   return (
-    <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <StudioLayout>
-        <Outlet />
-      </StudioLayout>
-      <Toaster />
-    </QueryClientProvider>
+    <AuthProvider>
+      <QueryClientProvider client={queryClient}>
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <StudioLayout>
+          <Outlet />
+        </StudioLayout>
+        <Toaster />
+      </QueryClientProvider>
+    </AuthProvider>
   );
 }

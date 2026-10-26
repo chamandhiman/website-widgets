@@ -14,6 +14,7 @@ import { WidgetPreview } from "@/components/WidgetPreview";
 import { InstallDialog } from "@/components/InstallDialog";
 import { embedCode, getSchema, loadSaved, saveWidget, type Config, type Field } from "@/lib/widgets";
 import { cn } from "@/lib/utils";
+import { WebsiteUrlField, normaliseWebsiteUrl, validateWebsiteUrl } from "@/components/editor/WebsiteUrlField";
 import { WhatsAppEditor } from "@/components/whatsapp/WhatsAppEditor";
 import { DEFAULT_WHATSAPP_CONFIG, type WhatsAppWidgetConfig } from "@/lib/whatsapp/types";
 import { AnnouncementEditor } from "@/components/announcement/AnnouncementEditor";
@@ -43,6 +44,7 @@ function Editor() {
   const schema = getSchema(type);
   const [config, setConfig] = useState<Config>(schema?.defaults ?? {});
   const [name, setName] = useState(schema?.def.name ?? "");
+  const [website, setWebsite] = useState("");
   const [mobile, setMobile] = useState(false);
   const [install, setInstall] = useState(false);
   const widgetId = useMemo(() => id ?? `wto_${Math.random().toString(36).slice(2, 9)}`, [id]);
@@ -50,7 +52,7 @@ function Editor() {
   useEffect(() => {
     if (!id || !schema) return;
     const s = loadSaved().find((w) => w.id === id);
-    if (s) { setConfig({ ...schema.defaults, ...s.config }); setName(s.name); }
+    if (s) { setConfig({ ...schema.defaults, ...s.config }); setName(s.name); setWebsite(s.website ?? ""); }
   }, [id, type]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!schema) {
@@ -132,7 +134,19 @@ function Editor() {
 
   const set = (k: string, v: Config[string]) => setConfig((c) => ({ ...c, [k]: v }));
   const save = () => {
-    saveWidget({ id: widgetId, type, name: name || schema.def.name, config, updatedAt: Date.now() });
+    // Block save if URL is invalid (non-empty + bad format)
+    if (validateWebsiteUrl(website)) {
+      toast.error("Please fix the Website URL before saving.");
+      return;
+    }
+    saveWidget({
+      id: widgetId,
+      type,
+      name: name || schema.def.name,
+      config,
+      updatedAt: Date.now(),
+      website: normaliseWebsiteUrl(website),
+    });
     toast.success("Widget saved");
     if (!id) navigate({ to: "/editor/$type", params: { type }, search: { id: widgetId }, replace: true });
   };
@@ -144,6 +158,10 @@ function Editor() {
         <div className="flex items-center gap-2 border-b p-4">
           <Button asChild variant="ghost" size="icon"><Link to="/widgets" aria-label="Back"><ArrowLeft className="h-4 w-4" /></Link></Button>
           <Input value={name} onChange={(e) => setName(e.target.value)} className="h-9 font-semibold" aria-label="Widget name" />
+        </div>
+        {/* Website URL field — sits between name and tabs */}
+        <div className="border-b px-4 py-3">
+          <WebsiteUrlField value={website} onChange={setWebsite} />
         </div>
         <Tabs defaultValue="content" className="flex min-h-0 flex-1 flex-col p-4">
           <TabsList className="grid w-full grid-cols-3">

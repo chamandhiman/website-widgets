@@ -14,10 +14,11 @@ import {
 import { useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { StudioTopNav } from "./StudioTopNav";
+import { AuthGuard } from "@/lib/auth";
 
 const NAV = [
   {
-    to: "/",
+    to: "/dashboard",
     label: "Dashboard",
     icon: LayoutDashboard,
     iconColor: "text-blue-500 dark:text-blue-400",
@@ -113,12 +114,18 @@ export function StudioLayout({ children }: { children: ReactNode }) {
     </nav>
   );
 
+  // Landing page and Login page are standalone full-page routes (no studio layout)
+  if (path === "/" || path === "/login") {
+    return <>{children}</>;
+  }
+
   return (
-    <div className="relative flex min-h-screen w-full bg-background overflow-hidden selection:bg-purple-500/20">
-      {/* ================= AMBIENT COLORFUL GRADIENT GLOWS ================= */}
-      <div className="pointer-events-none fixed -top-40 -left-40 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-purple-500/12 via-indigo-500/8 to-transparent blur-3xl" />
-      <div className="pointer-events-none fixed top-1/4 right-0 h-[600px] w-[600px] rounded-full bg-gradient-to-bl from-blue-500/12 via-cyan-500/8 to-transparent blur-3xl" />
-      <div className="pointer-events-none fixed -bottom-40 left-1/3 h-[500px] w-[500px] rounded-full bg-gradient-to-tr from-pink-500/10 via-amber-500/8 to-transparent blur-3xl" />
+    <AuthGuard>
+      <div className="relative flex min-h-screen w-full bg-background overflow-x-clip selection:bg-purple-500/20">
+        {/* ================= AMBIENT COLORFUL GRADIENT GLOWS ================= */}
+        <div className="pointer-events-none fixed -top-40 -left-40 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-purple-500/12 via-indigo-500/8 to-transparent blur-3xl" />
+        <div className="pointer-events-none fixed top-1/4 right-0 h-[600px] w-[600px] rounded-full bg-gradient-to-bl from-blue-500/12 via-cyan-500/8 to-transparent blur-3xl" />
+        <div className="pointer-events-none fixed -bottom-40 left-1/3 h-[500px] w-[500px] rounded-full bg-gradient-to-tr from-pink-500/10 via-amber-500/8 to-transparent blur-3xl" />
 
       {/* ================= DESKTOP SIDEBAR ================= */}
       <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col gap-6 border-r border-border/70 bg-card/85 backdrop-blur-xl p-5 md:flex z-10 shadow-xs">
@@ -183,6 +190,7 @@ export function StudioLayout({ children }: { children: ReactNode }) {
         <main className="flex-1">{children}</main>
       </div>
     </div>
+    </AuthGuard>
   );
 }
 
@@ -191,7 +199,7 @@ export function PageHeader({
   description,
   children,
 }: {
-  title: string;
+  title: ReactNode;
   description: string;
   children?: ReactNode;
 }) {

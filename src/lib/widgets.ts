@@ -194,7 +194,7 @@ export function getSchema(type: string) {
   return { def, fields: [...s.fields, ...common(def.kind)], defaults: s.defaults };
 }
 
-export interface SavedWidget { id: string; type: string; name: string; config: Config; updatedAt: number }
+export interface SavedWidget { id: string; type: string; name: string; config: Config; updatedAt: number; website?: string }
 const KEY = "wto.savedWidgets";
 
 export function loadSaved(): SavedWidget[] {
