@@ -6,6 +6,7 @@
     "directory": ".output/public"
   },
   "name": "website-widgets",
+  "account_id": "b9edad38360cdc2e46d879f88de4a8d8",
   "compatibility_flags": [
     "nodejs_compat"
   ],
