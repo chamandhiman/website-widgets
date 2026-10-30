@@ -1,6 +1,7 @@
 import {
   Star, Instagram, Facebook, MessageCircle, HelpCircle, Timer, Quote, Mail, PanelTop,
   CalendarDays, Share2, Youtube, Accessibility, Languages, MapPin, Megaphone, Code2,
+  Layers,
   type LucideIcon,
 } from "lucide-react";
 
@@ -38,22 +39,23 @@ export function sortWidgetsByPriority(list: WidgetDef[]): WidgetDef[] {
 }
 
 const RAW_WIDGETS: WidgetDef[] = [
-  { type: "google-reviews", name: "Google Reviews", description: "Show your best Google reviews to build trust.", category: "Reviews", kind: "page", icon: Star, ready: true },
-  { type: "instagram-feed", name: "Instagram Feed", description: "Embed a stylish grid of your Instagram posts.", category: "Social", kind: "page", icon: Instagram, ready: false },
+  { type: "google-reviews", name: "Google Reviews", description: "Embed reviews for your business from Google right on your site.", category: "Reviews", kind: "page", icon: Star, ready: true, designsCount: 5, badge: "Popular" },
+  { type: "instagram-feed", name: "Instagram Feed", description: "Add posts from your Instagram account or by hashtag to your website.", category: "Social", kind: "page", icon: Instagram, ready: false, designsCount: 6, badge: "Popular" },
   { type: "facebook-feed", name: "Facebook Feed", description: "Display your Facebook page posts on your site.", category: "Social", kind: "page", icon: Facebook, ready: false },
-  { type: "whatsapp-chat", name: "WhatsApp Chat", description: "Floating chat button that opens WhatsApp.", category: "Chat", kind: "floating", icon: MessageCircle, ready: true },
-  { type: "faq", name: "FAQ Accordion", description: "Answer common questions in a tidy accordion.", category: "Content", kind: "page", icon: HelpCircle, ready: true },
-  { type: "countdown", name: "Countdown Timer", description: "Create urgency with a live countdown.", category: "Promotion", kind: "page", icon: Timer, ready: true },
-  { type: "testimonials", name: "Testimonials", description: "Highlight quotes from happy customers.", category: "Reviews", kind: "page", icon: Quote, ready: true },
+  { type: "whatsapp-chat", name: "WhatsApp Chat", description: "Floating chat button that opens WhatsApp conversations.", category: "Chat", kind: "floating", icon: MessageCircle, ready: true, designsCount: 3, badge: "Popular" },
+  { type: "faq", name: "FAQ Accordion", description: "Add beautiful FAQ sections to answer common questions.", category: "Content", kind: "page", icon: HelpCircle, ready: true, designsCount: 6, badge: "New" },
+  { type: "countdown", name: "Countdown Timer", description: "Create urgency and boost sales with countdown timers.", category: "Promotion", kind: "page", icon: Timer, ready: true, designsCount: 6, badge: "Trending" },
+  { type: "testimonial-slider", name: "Testimonial Slider", description: "Showcase customer reviews and build trust with beautiful testimonials.", category: "Reviews", kind: "page", icon: Quote, ready: true, designsCount: 6, badge: "Trending" },
   { type: "contact-form", name: "Contact Form", description: "Collect leads with a simple contact form.", category: "Forms", kind: "page", icon: Mail, ready: false },
-  { type: "popup", name: "Popup Widget", description: "Create eye-catching popups to engage your visitors and increase conversions.", category: "Promotion", kind: "floating", icon: PanelTop, ready: true },
-  { type: "event-calendar", name: "Event Calendar", description: "List upcoming events in a clean calendar.", category: "Content", kind: "page", icon: CalendarDays, ready: false },
+  { type: "popup", name: "Popup Widget", description: "Create eye-catching popups to engage your visitors and increase conversions.", category: "Promotion", kind: "floating", icon: PanelTop, ready: true, designsCount: 8, badge: "Popular" },
+  { type: "event-calendar", name: "Event Calendar", description: "Present events, schedule, agenda and more on your website.", category: "Content", kind: "page", icon: CalendarDays, ready: true, designsCount: 6, badge: "New" },
+  { type: "logo-carousel", name: "Logo Carousel", description: "Display client logos, trusted brands, technology partners and more.", category: "Promotion", kind: "page", icon: Layers, ready: true, designsCount: 8, badge: "Popular" },
   { type: "social-feed", name: "Social Media Feed", description: "Combine all your social channels in one feed.", category: "Social", kind: "page", icon: Share2, ready: false },
   { type: "youtube-gallery", name: "YouTube Gallery", description: "Showcase videos from your YouTube channel.", category: "Social", kind: "page", icon: Youtube, ready: false },
   { type: "accessibility", name: "Accessibility Widget", description: "Let visitors adjust contrast and text size.", category: "Utility", kind: "floating", icon: Accessibility, ready: false },
   { type: "language-switcher", name: "Language Switcher", description: "Floating menu to switch site language.", category: "Utility", kind: "floating", icon: Languages, ready: false },
   { type: "store-locator", name: "Store Locator", description: "Help customers find your nearest location.", category: "Utility", kind: "page", icon: MapPin, ready: false },
-  { type: "announcement-bar", name: "Announcement Bar", description: "Slim top bar for news and promotions.", category: "Promotion", kind: "page", icon: Megaphone, ready: true },
+  { type: "announcement-bar", name: "Announcement Bar", description: "Slim top bar for news, flash sales and promotions.", category: "Promotion", kind: "page", icon: Megaphone, ready: true, designsCount: 6, badge: "Popular" },
   { type: "custom-html", name: "Custom HTML", description: "Drop in any custom HTML snippet.", category: "Utility", kind: "page", icon: Code2, ready: false },
 ];
 
@@ -61,7 +63,7 @@ export const WIDGETS: WidgetDef[] = sortWidgetsByPriority(RAW_WIDGETS);
 
 export const CATEGORIES: ("All" | Category)[] = ["All", "Reviews", "Social", "Chat", "Content", "Forms", "Promotion", "Utility"];
 
-export type FieldType = "text" | "textarea" | "color" | "select" | "range" | "toggle";
+export type FieldType = "text" | "textarea" | "color" | "select" | "range" | "toggle" | "datetime-local";
 export type Group = "content" | "layout" | "theme";
 export interface Field {
   key: string; label: string; type: FieldType; group: Group;
@@ -120,11 +122,27 @@ export const SCHEMAS: Record<string, { fields: Field[]; defaults: Config }> = {
   countdown: {
     fields: [
       { key: "title", label: "Headline", type: "text", group: "content" },
-      { key: "target", label: "End date (YYYY-MM-DD)", type: "text", group: "content" },
-      { key: "showSeconds", label: "Show seconds", type: "toggle", group: "layout" },
+      { key: "target", label: "Target date & time", type: "datetime-local", group: "content" },
+      { key: "timezone", label: "Timezone", type: "select", group: "content", options: ["Local", "UTC"] },
+      { key: "expiryMessage", label: "Completion message", type: "text", group: "content" },
       { key: "style", label: "Style", type: "select", group: "layout", options: ["Boxes", "Minimal"] },
+      { key: "showDays", label: "Show days", type: "toggle", group: "layout" },
+      { key: "showHours", label: "Show hours", type: "toggle", group: "layout" },
+      { key: "showMinutes", label: "Show minutes", type: "toggle", group: "layout" },
+      { key: "showSeconds", label: "Show seconds", type: "toggle", group: "layout" },
     ],
-    defaults: { ...baseDefaults, title: "Summer sale ends in", target: "2026-12-31", showSeconds: true, style: "Boxes" },
+    defaults: {
+      ...baseDefaults,
+      title: "Summer sale ends in",
+      target: "2027-12-31T23:59",
+      timezone: "Local",
+      expiryMessage: "Offer has ended.",
+      style: "Boxes",
+      showDays: true,
+      showHours: true,
+      showMinutes: true,
+      showSeconds: true,
+    },
   },
   testimonials: {
     fields: [
@@ -185,11 +203,88 @@ export const SCHEMAS: Record<string, { fields: Field[]; defaults: Config }> = {
       textColor: "#111827",
     },
   },
+  "event-calendar": {
+    fields: [
+      { key: "title", label: "Calendar heading", type: "text", group: "content" },
+      { key: "description", label: "Description", type: "textarea", group: "content" },
+      { key: "designId", label: "Design template", type: "select", group: "layout", options: ["Minimal List", "Modern Cards", "Monthly Calendar", "Agenda", "Compact", "Featured Events"] },
+      { key: "upcomingOnly", label: "Upcoming events only", type: "toggle", group: "layout" },
+      { key: "showDescriptions", label: "Show descriptions", type: "toggle", group: "layout" },
+      { key: "showLocations", label: "Show locations", type: "toggle", group: "layout" },
+      { key: "showImages", label: "Show images", type: "toggle", group: "layout" },
+    ],
+    defaults: {
+      ...baseDefaults,
+      title: "Upcoming Events",
+      description: "Browse our upcoming workshops, live webinars, and community meetups.",
+      designId: "modern-cards",
+      upcomingOnly: true,
+      maxEvents: 10,
+      showDescriptions: true,
+      showLocations: true,
+      showImages: true,
+      dateFormat: "MMM D, YYYY",
+      timeFormat: "12h",
+      emptyStateMessage: "No upcoming events scheduled at this moment. Please check back soon!",
+    },
+  },
+  "testimonial-slider": {
+    fields: [
+      { key: "title", label: "Section heading", type: "text", group: "content" },
+      { key: "description", label: "Description", type: "textarea", group: "content" },
+      { key: "designId", label: "Design template", type: "select", group: "layout", options: ["Modern Cards", "Minimal", "Elegant", "Dark", "Quote Focus", "Compact Slider"] },
+      { key: "autoplay", label: "Autoplay", type: "toggle", group: "layout" },
+      { key: "showArrows", label: "Show navigation arrows", type: "toggle", group: "layout" },
+      { key: "showDots", label: "Show pagination dots", type: "toggle", group: "layout" },
+      { key: "showPhotos", label: "Show photos", type: "toggle", group: "layout" },
+      { key: "showRatings", label: "Show ratings", type: "toggle", group: "layout" },
+      { key: "showDesignation", label: "Show job title", type: "toggle", group: "layout" },
+      { key: "showCompany", label: "Show company name", type: "toggle", group: "layout" },
+    ],
+    defaults: {
+      ...baseDefaults,
+      title: "What Our Customers Say",
+      description: "Real stories and verified experiences from teams around the world.",
+      designId: "modern-cards",
+      autoplay: true,
+      autoplayInterval: 5,
+      showArrows: true,
+      showDots: true,
+      desktopColumns: 2,
+      showPhotos: true,
+      showRatings: true,
+      showDesignation: true,
+      showCompany: true,
+    },
+  },
+  "logo-carousel": {
+    fields: [
+      { key: "title", label: "Heading", type: "text", group: "content" },
+      { key: "description", label: "Description", type: "textarea", group: "content" },
+      { key: "designId", label: "Design template", type: "select", group: "layout", options: ["Classic Logo Carousel", "Trusted By", "Infinite Marquee", "Grayscale to Color", "Logo Grid", "Premium Cards", "Dark Showcase", "Compact Partner Strip"] },
+      { key: "autoplay", label: "Autoplay", type: "toggle", group: "layout" },
+      { key: "showArrows", label: "Show navigation arrows", type: "toggle", group: "layout" },
+      { key: "showDots", label: "Show pagination dots", type: "toggle", group: "layout" },
+      { key: "grayscale", label: "Grayscale mode", type: "toggle", group: "theme" },
+    ],
+    defaults: {
+      ...baseDefaults,
+      title: "Trusted by 10,000+ Fast-Growing Companies",
+      description: "Powering innovative engineering and marketing teams around the globe.",
+      designId: "classic",
+      autoplay: true,
+      speed: 4,
+      showArrows: true,
+      showDots: true,
+      grayscale: false,
+    },
+  },
 };
 
 export function getSchema(type: string) {
-  const def = WIDGETS.find((w) => w.type === type);
-  const s = SCHEMAS[type];
+  const normalizedType = type === "testimonials" ? "testimonial-slider" : type;
+  const def = WIDGETS.find((w) => w.type === type || (type === "testimonials" && w.type === "testimonial-slider"));
+  const s = SCHEMAS[type] || SCHEMAS[normalizedType];
   if (!def || !s) return null;
   return { def, fields: [...s.fields, ...common(def.kind)], defaults: s.defaults };
 }
@@ -201,12 +296,38 @@ export function loadSaved(): SavedWidget[] {
   if (typeof window === "undefined") return [];
   try { return JSON.parse(localStorage.getItem(KEY) || "[]"); } catch { return []; }
 }
+
+export const DEFAULT_PLAN = {
+  name: "Free plan",
+  maxWidgets: 10,
+};
+
+export interface PlanUsage {
+  count: number;
+  limit: number;
+  percentage: number;
+  planName: string;
+}
+
+export function getPlanUsage(): PlanUsage {
+  const count = loadSaved().length;
+  const limit = DEFAULT_PLAN.maxWidgets;
+  const percentage = Math.min(100, Math.round((count / limit) * 100));
+  return { count, limit, percentage, planName: DEFAULT_PLAN.name };
+}
+
 export function saveWidget(w: SavedWidget) {
   const all = loadSaved().filter((x) => x.id !== w.id);
   localStorage.setItem(KEY, JSON.stringify([w, ...all]));
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent("wto-saved-changed"));
+  }
 }
 export function deleteWidget(id: string) {
   localStorage.setItem(KEY, JSON.stringify(loadSaved().filter((x) => x.id !== id)));
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent("wto-saved-changed"));
+  }
 }
 
 import { getWidgetScriptUrl } from "./embed";

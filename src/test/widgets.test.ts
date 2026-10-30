@@ -10,7 +10,7 @@ describe("widget catalog", () => {
     expect(WIDGETS[1].type).toBe("announcement-bar");
     expect(WIDGETS[2].type).toBe("popup");
     expect(WIDGETS[3].type).toBe("google-reviews");
-    expect(WIDGETS.length).toBe(17);
+    expect(WIDGETS.length).toBe(18);
   });
 
   it("filters by category and search while preserving priority", () => {

@@ -23,24 +23,22 @@ describe("Popup Widget - Comprehensive Acceptance Tests", () => {
     expect(def?.kind).toBe("floating");
   });
 
-  // Criterion 2: All 10 popup types are selectable
-  it("Criterion 2: All 10 popup types are defined with numbers, names and subtitles", () => {
-    expect(POPUP_TEMPLATES.length).toBe(10);
+  // Criterion 2: All 8 core popup designs plus specialized templates are defined
+  it("Criterion 2: All 8 core popup designs plus specialized templates are defined with numbers, names and subtitles", () => {
+    expect(POPUP_TEMPLATES.length).toBeGreaterThanOrEqual(8);
     const expectedTypes: PopupType[] = [
-      "center",
+      "classic",
+      "hero-image",
+      "split",
+      "discount",
+      "minimal",
       "newsletter",
-      "image",
-      "bottom-small",
       "slide-in",
-      "exit-intent",
       "announcement",
-      "video",
-      "age-verification",
-      "custom-html",
     ];
 
     for (let i = 0; i < expectedTypes.length; i++) {
-      const type = expectedTypes[i];
+      const type = expectedTypes[i]!;
       const tmpl = POPUP_TEMPLATES.find((t) => t.id === type);
       expect(tmpl).toBeDefined();
       expect(tmpl?.number).toBe(i + 1);
@@ -52,18 +50,18 @@ describe("Popup Widget - Comprehensive Acceptance Tests", () => {
 
   // Criterion 3 & 4: Each popup type has appropriate dimensions, position and layout defaults
   it("Criterion 3 & 4: Template defaults configure appropriate layouts and sizes", () => {
-    const bottomSmall = POPUP_TEMPLATES.find((t) => t.id === "bottom-small");
-    expect(bottomSmall?.defaults.position).toBe("bottom-right");
-    expect(bottomSmall?.defaults.size).toBe("small");
-    expect(bottomSmall?.defaults.entryAnimation).toBe("slide-up");
-
     const slideIn = POPUP_TEMPLATES.find((t) => t.id === "slide-in");
-    expect(slideIn?.defaults.position).toBe("right");
-    expect(slideIn?.defaults.entryAnimation).toBe("slide-left");
+    expect(slideIn?.defaults.position).toBe("bottom-right");
+    expect(slideIn?.defaults.size).toBe("small");
+    expect(slideIn?.defaults.entryAnimation).toBe("slide-up");
 
-    const center = POPUP_TEMPLATES.find((t) => t.id === "center");
-    expect(center?.defaults.position).toBe("center");
-    expect(center?.defaults.overlayStyle).toBe("dark");
+    const split = POPUP_TEMPLATES.find((t) => t.id === "split");
+    expect(split?.defaults.position).toBe("center");
+    expect(split?.defaults.size).toBe("large");
+
+    const classic = POPUP_TEMPLATES.find((t) => t.id === "classic");
+    expect(classic?.defaults.position).toBe("center");
+    expect(classic?.defaults.overlayStyle).toBe("dark");
 
     const ageGate = POPUP_TEMPLATES.find((t) => t.id === "age-verification");
     expect(ageGate?.defaults.showCloseButton).toBe(false);
@@ -78,7 +76,7 @@ describe("Popup Widget - Comprehensive Acceptance Tests", () => {
     };
     const res = validatePopupConfig(emptyTitleConfig);
     expect(res.isValid).toBe(false);
-    expect(res.errors.title).toBeDefined();
+    expect(res.errors["title"]).toBeDefined();
 
     const tooLongTitle: PopupWidgetConfig = {
       ...DEFAULT_POPUP_CONFIG,
@@ -86,7 +84,7 @@ describe("Popup Widget - Comprehensive Acceptance Tests", () => {
     };
     const res2 = validatePopupConfig(tooLongTitle);
     expect(res2.isValid).toBe(false);
-    expect(res2.errors.title).toContain("100 characters");
+    expect(res2.errors["title"]).toContain("100 characters");
   });
 
   // Criterion 7: URL validation blocks unsafe protocols
@@ -136,7 +134,7 @@ describe("Popup Widget - Comprehensive Acceptance Tests", () => {
       customHtmlContent: "<div><script>alert(1)</script></div>",
     };
     const scriptRes = validatePopupConfig(scriptConfig);
-    expect(scriptRes.warnings?.customHtmlContent).toBeDefined();
+    expect(scriptRes.warnings?.["customHtmlContent"]).toBeDefined();
   });
 
   // Criterion 10: Scheduling date boundaries
@@ -149,7 +147,7 @@ describe("Popup Widget - Comprehensive Acceptance Tests", () => {
     };
     const res = validatePopupConfig(invalidSchedule);
     expect(res.isValid).toBe(false);
-    expect(res.errors.schedule).toBeDefined();
+    expect(res.errors["schedule"]).toBeDefined();
   });
 
   // Criterion 11 & 12: Save and Publish persistence

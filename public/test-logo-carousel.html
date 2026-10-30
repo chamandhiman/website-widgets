@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Logo Carousel Standalone Embed Test</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      margin: 0;
+      padding: 40px 20px;
+      background: #f8fafc;
+      color: #0f172a;
+    }
+    .page-container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 32px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+    h1 {
+      font-size: 28px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    h2 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-top: 0;
+      margin-bottom: 16px;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <h1>WebToolOcean — Logo Carousel Embed Test</h1>
+    <p>Testing production embed script functionality, Shadow DOM isolation, and responsiveness.</p>
+
+    <!-- Test Instance 1: Default Carousel -->
+    <div class="card">
+      <h2>1. Live Embedded Carousel (Classic / Auto-Initialized)</h2>
+      <div class="wto-widget" data-widget="logo-carousel" data-id="demo-carousel-1"></div>
+      <script src="/embed/logo-carousel.js" data-widget-id="demo-carousel-1" async></script>
+    </div>
+
+    <!-- Test Instance 2: Infinite Marquee via data-config -->
+    <div class="card">
+      <h2>2. Infinite Marquee Design</h2>
+      <div class="wto-widget" data-widget="logo-carousel" data-id="demo-marquee"></div>
+      <script>
+        window.WTO_LOGO_CAROUSEL_CONFIGS = window.WTO_LOGO_CAROUSEL_CONFIGS || {};
+        window.WTO_LOGO_CAROUSEL_CONFIGS["demo-marquee"] = {
+          designId: "infinite-marquee",
+          title: "Continuous Seamless Marquee",
+          description: "Smooth continuous movement with pause on hover.",
+          speed: 6,
+          direction: "left",
+          gap: 40,
+          logoHeight: 42
+        };
+      </script>
+    </div>
+
+    <!-- Test Instance 3: Responsive Logo Grid -->
+    <div class="card">
+      <h2>3. Responsive Logo Grid Design</h2>
+      <div class="wto-widget" data-widget="logo-carousel" data-id="demo-grid"></div>
+      <script>
+        window.WTO_LOGO_CAROUSEL_CONFIGS = window.WTO_LOGO_CAROUSEL_CONFIGS || {};
+        window.WTO_LOGO_CAROUSEL_CONFIGS["demo-grid"] = {
+          designId: "logo-grid",
+          title: "Our Certified Partners",
+          description: "Clean static grid without moving timers.",
+          gridColumns: 4,
+          gap: 24,
+          logoHeight: 36
+        };
+      </script>
+    </div>
+  </div>
+</body>
+</html>

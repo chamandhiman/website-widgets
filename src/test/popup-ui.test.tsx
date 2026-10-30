@@ -7,29 +7,27 @@ import { PopupInstallModal } from "@/components/popup/PopupInstallModal";
 import { DEFAULT_POPUP_CONFIG } from "@/lib/popup/types";
 
 describe("Popup Widget UI Components", () => {
-  it("PopupTypeGallery renders all 10 template options and responds to click", () => {
+  it("PopupTypeGallery renders all template options and responds to click", () => {
     const onSelect = vi.fn();
     render(
       <PopupTypeGallery
-        selectedTemplate="center"
+        selectedTemplate="classic"
         onSelectTemplate={onSelect}
       />
     );
 
     expect(screen.getByText("Choose a Popup Type")).toBeDefined();
-    expect(screen.getByText("1. Center Popup")).toBeDefined();
-    expect(screen.getByText("2. Newsletter Popup")).toBeDefined();
-    expect(screen.getByText("3. Image Popup")).toBeDefined();
-    expect(screen.getByText("4. Bottom Small")).toBeDefined();
-    expect(screen.getByText("5. Slide In Popup")).toBeDefined();
-    expect(screen.getByText("6. Exit Intent Popup")).toBeDefined();
-    expect(screen.getByText("7. Announcement")).toBeDefined();
-    expect(screen.getByText("8. Video Popup")).toBeDefined();
-    expect(screen.getByText("9. Age Verification")).toBeDefined();
-    expect(screen.getByText("10. Custom HTML")).toBeDefined();
+    expect(screen.getByText("1. Classic Center Modal")).toBeDefined();
+    expect(screen.getByText("2. Image Hero Popup")).toBeDefined();
+    expect(screen.getByText("3. Split Image & Content")).toBeDefined();
+    expect(screen.getByText("4. Discount Offer")).toBeDefined();
+    expect(screen.getByText("5. Minimal Elegant")).toBeDefined();
+    expect(screen.getByText("6. Newsletter Signup")).toBeDefined();
+    expect(screen.getByText("7. Side Slide-In")).toBeDefined();
+    expect(screen.getByText("8. Announcement Popup")).toBeDefined();
 
     // Click on Newsletter template
-    fireEvent.click(screen.getByText("2. Newsletter Popup"));
+    fireEvent.click(screen.getByText("6. Newsletter Signup"));
     expect(onSelect).toHaveBeenCalled();
   });
 
@@ -65,7 +63,27 @@ describe("Popup Widget UI Components", () => {
     expect(screen.queryByText("Overlay Style")).toBeNull();
   });
 
-  it("PopupConfigTabs renders 4 configuration tabs and allows editing title", () => {
+  it("PopupLivePreview renders distinct layout for Split template with image & CTA", () => {
+    render(
+      <PopupLivePreview
+        config={{
+          ...DEFAULT_POPUP_CONFIG,
+          templateId: "split",
+          title: "VIP Exclusive Access",
+          discountBadge: "MEMBERS ONLY",
+          couponCode: "VIPCLUB",
+        }}
+        viewport="desktop"
+        onViewportChange={vi.fn()}
+      />
+    );
+
+    expect(screen.getByText("VIP Exclusive Access")).toBeDefined();
+    expect(screen.getByText("MEMBERS ONLY")).toBeDefined();
+    expect(screen.getByText("VIPCLUB")).toBeDefined();
+  });
+
+  it("PopupConfigTabs renders 3 modern configuration tabs (Designs, Content, Preferences) and allows editing title", () => {
     const onUpdate = vi.fn();
     const onReset = vi.fn();
 
@@ -75,17 +93,17 @@ describe("Popup Widget UI Components", () => {
         widgetId="test_popup_123"
         updateConfig={onUpdate}
         onResetDefaults={onReset}
+        defaultTab="content"
       />
     );
 
-    // Tab buttons exist
-    expect(screen.getByRole("tab", { name: "Setup" })).toBeDefined();
-    expect(screen.getByRole("tab", { name: "Style" })).toBeDefined();
-    expect(screen.getByRole("tab", { name: "Position" })).toBeDefined();
-    expect(screen.getByRole("tab", { name: "Trigger" })).toBeDefined();
+    // Modern 3 Tab buttons exist
+    expect(screen.getByRole("tab", { name: "Designs" })).toBeDefined();
+    expect(screen.getByRole("tab", { name: "Content" })).toBeDefined();
+    expect(screen.getByRole("tab", { name: "Preferences" })).toBeDefined();
 
-    // Setup tab elements
-    expect(screen.getByText("Popup Style")).toBeDefined();
+    // Content tab elements
+    expect(screen.getByText("Basic Content")).toBeDefined();
     expect(screen.getByDisplayValue("Special Offer! 🎉")).toBeDefined();
 
     const titleInput = screen.getByDisplayValue("Special Offer! 🎉");
@@ -93,7 +111,32 @@ describe("Popup Widget UI Components", () => {
     expect(onUpdate).toHaveBeenCalledWith("title", "Mega Sale 50% Off!");
   });
 
-  it("PopupInstallModal displays widget ID and script snippet", () => {
+  it("PopupConfigTabs allows selecting a design in Designs tab", () => {
+    const onSelectTemplate = vi.fn();
+
+    render(
+      <PopupConfigTabs
+        config={DEFAULT_POPUP_CONFIG}
+        widgetId="test_popup_123"
+        updateConfig={vi.fn()}
+        onResetDefaults={vi.fn()}
+        onSelectTemplate={onSelectTemplate}
+        defaultTab="designs"
+      />
+    );
+
+    // Check designs tab content
+    expect(screen.getByText("Select Popup Design")).toBeDefined();
+    expect(screen.getByText("1. Classic Center Modal")).toBeDefined();
+    expect(screen.getByText("3. Split Image & Content")).toBeDefined();
+    expect(screen.getByText("4. Discount Offer")).toBeDefined();
+
+    // Click on Split design
+    fireEvent.click(screen.getByText("3. Split Image & Content"));
+    expect(onSelectTemplate).toHaveBeenCalled();
+  });
+
+  it("PopupInstallModal renders simplified modal with standard embed script and copy button", () => {
     render(
       <PopupInstallModal
         isOpen={true}
@@ -103,8 +146,10 @@ describe("Popup Widget UI Components", () => {
       />
     );
 
-    expect(screen.getByText("Install Popup Widget")).toBeDefined();
-    expect(screen.getByText("wto_popup_test_id")).toBeDefined();
+    expect(screen.getByText("Install Widget")).toBeDefined();
     expect(screen.getByText(/data-widget-id="wto_popup_test_id"/)).toBeDefined();
+    expect(screen.getByText("Copy Code")).toBeDefined();
+    expect(screen.getByText("Done")).toBeDefined();
+    expect(screen.queryByText("Architecture & Hosting Transparency Note")).toBeNull();
   });
 });

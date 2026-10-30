@@ -23,6 +23,14 @@ import { PopupEditor } from "@/components/popup/PopupEditor";
 import { DEFAULT_POPUP_CONFIG, type PopupWidgetConfig } from "@/lib/popup/types";
 import { FaqEditor } from "@/components/faq/FaqEditor";
 import { migrateFaqConfig, type FaqWidgetConfig } from "@/lib/faq/types";
+import { CountdownEditor } from "@/components/countdown/CountdownEditor";
+import { migrateCountdownConfig, type CountdownConfig } from "@/lib/countdown/types";
+import { EventCalendarEditor } from "@/components/calendar/EventCalendarEditor";
+import { migrateCalendarConfig, type EventCalendarConfig } from "@/lib/calendar/types";
+import { TestimonialSliderEditor } from "@/components/testimonial/TestimonialSliderEditor";
+import { migrateTestimonialConfig, type TestimonialSliderConfig } from "@/lib/testimonial/types";
+import { LogoCarouselEditor } from "@/components/logo-carousel/LogoCarouselEditor";
+import { migrateLogoCarouselConfig, type LogoCarouselConfig } from "@/lib/logo-carousel/types";
 
 export const Route = createFileRoute("/editor/$type")({
   validateSearch: (s: Record<string, unknown>): { id?: string | undefined } => ({ id: typeof s["id"] === "string" ? (s["id"] as string) : undefined }),
@@ -132,6 +140,66 @@ function Editor() {
     );
   }
 
+  // Use the dedicated Countdown Timer Editor for Countdown
+  if (type === "countdown" || type === "countdown-timer") {
+    const saved = id ? loadSaved().find((w) => w.id === id) : undefined;
+    const countdownConfig: CountdownConfig = migrateCountdownConfig(saved?.config as any);
+    return (
+      <CountdownEditor
+        initialConfig={countdownConfig}
+        widgetId={widgetId}
+        widgetName={saved?.name || name || "Countdown Timer"}
+        isExisting={Boolean(id)}
+        initialWebsite={saved?.website || website || ""}
+      />
+    );
+  }
+
+  // Use the dedicated Event Calendar Editor for Event Calendar
+  if (type === "event-calendar" || type === "calendar") {
+    const saved = id ? loadSaved().find((w) => w.id === id) : undefined;
+    const calendarConfig: EventCalendarConfig = migrateCalendarConfig(saved?.config as any);
+    return (
+      <EventCalendarEditor
+        initialConfig={calendarConfig}
+        widgetId={widgetId}
+        widgetName={saved?.name || name || "Event Calendar"}
+        isExisting={Boolean(id)}
+        initialWebsite={saved?.website || website || ""}
+      />
+    );
+  }
+
+  // Use the dedicated Testimonial Slider Editor for Testimonial Slider
+  if (type === "testimonial-slider" || type === "testimonials") {
+    const saved = id ? loadSaved().find((w) => w.id === id) : undefined;
+    const testimonialConfig: TestimonialSliderConfig = migrateTestimonialConfig(saved?.config as any);
+    return (
+      <TestimonialSliderEditor
+        initialConfig={testimonialConfig}
+        widgetId={widgetId}
+        widgetName={saved?.name || name || "Testimonial Slider"}
+        isExisting={Boolean(id)}
+        initialWebsite={saved?.website || website || ""}
+      />
+    );
+  }
+
+  // Use the dedicated Logo Carousel Editor for Logo Carousel
+  if (type === "logo-carousel" || type === "logos") {
+    const saved = id ? loadSaved().find((w) => w.id === id) : undefined;
+    const logoConfig: LogoCarouselConfig = migrateLogoCarouselConfig(saved?.config as any);
+    return (
+      <LogoCarouselEditor
+        initialConfig={logoConfig}
+        widgetId={widgetId}
+        widgetName={saved?.name || name || "Logo Carousel"}
+        isExisting={Boolean(id)}
+        initialWebsite={saved?.website || website || ""}
+      />
+    );
+  }
+
   const set = (k: string, v: Config[string]) => setConfig((c) => ({ ...c, [k]: v }));
   const save = () => {
     // Block save if URL is invalid (non-empty + bad format)
@@ -223,6 +291,14 @@ function FieldControl({ f, value, onChange }: { f: Field; value: Config[string];
     <div className="space-y-2">
       <div className="flex justify-between"><Label htmlFor={id}>{f.label}</Label>{f.type === "range" && <span className="text-xs text-muted-foreground">{String(value)}</span>}</div>
       {f.type === "text" && <Input id={id} value={String(value)} onChange={(e) => onChange(e.target.value)} />}
+      {f.type === "datetime-local" && (
+        <Input
+          id={id}
+          type="datetime-local"
+          value={String(value).includes("T") ? String(value) : (String(value) ? `${String(value)}T23:59` : "")}
+          onChange={(e) => onChange(e.target.value)}
+        />
+      )}
       {f.type === "textarea" && <Textarea id={id} rows={4} value={String(value)} onChange={(e) => onChange(e.target.value)} />}
       {f.type === "range" && <Slider id={id} min={f.min ?? 0} max={f.max ?? 100} step={f.step ?? 1} value={[Number(value)]} onValueChange={(v) => onChange(v[0] ?? 0)} />}
       {f.type === "color" && (

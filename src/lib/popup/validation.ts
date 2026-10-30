@@ -72,50 +72,50 @@ export function validatePopupConfig(config: PopupWidgetConfig): PopupValidationR
   // Title validation
   if (config.templateId !== "custom-html") {
     if (!config.title || config.title.trim().length === 0) {
-      errors.title = "Popup title is required.";
+      errors["title"] = "Popup title is required.";
     } else if (config.title.length > 100) {
-      errors.title = "Title cannot exceed 100 characters.";
+      errors["title"] = "Title cannot exceed 100 characters.";
     }
   }
 
   // Description length
   if (config.description && config.description.length > 300) {
-    errors.description = "Description cannot exceed 300 characters.";
+    errors["description"] = "Description cannot exceed 300 characters.";
   }
 
   // Primary Button URL
   if (config.primaryButtonUrl && !isSafeUrl(config.primaryButtonUrl)) {
-    errors.primaryButtonUrl = "Please enter a valid, safe URL (http, https, mailto, tel, or #).";
+    errors["primaryButtonUrl"] = "Please enter a valid, safe URL (http, https, mailto, tel, or #).";
   }
 
   // Secondary Button URL
   if (config.hasSecondaryButton && config.secondaryButtonUrl && !isSafeUrl(config.secondaryButtonUrl)) {
-    errors.secondaryButtonUrl = "Secondary button URL must be a valid, safe destination.";
+    errors["secondaryButtonUrl"] = "Secondary button URL must be a valid, safe destination.";
   }
 
   // Template specific checks
   if (config.templateId === "video") {
     if (!config.videoUrl || config.videoUrl.trim().length === 0) {
-      errors.videoUrl = "Video URL is required for Video Popups.";
+      errors["videoUrl"] = "Video URL is required for Video Popups.";
     } else {
       const parsed = parseVideoUrl(config.videoUrl);
       if (parsed.platform === "unknown") {
-        errors.videoUrl = "Please provide a valid YouTube, Vimeo, or direct MP4 video URL.";
+        errors["videoUrl"] = "Please provide a valid YouTube, Vimeo, or direct MP4 video URL.";
       }
     }
   }
 
   if (config.templateId === "custom-html") {
     if (!config.customHtmlContent || config.customHtmlContent.trim().length === 0) {
-      errors.customHtmlContent = "Custom HTML content cannot be empty.";
+      errors["customHtmlContent"] = "Custom HTML content cannot be empty.";
     } else if (/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi.test(config.customHtmlContent)) {
-      warnings.customHtmlContent = "Script tags are disabled in editor preview for security.";
+      warnings["customHtmlContent"] = "Script tags are disabled in editor preview for security.";
     }
   }
 
   if (config.templateId === "age-verification") {
     if (config.declineAction === "redirect" && config.declineUrl && !isSafeUrl(config.declineUrl)) {
-      errors.declineUrl = "Decline redirect URL must be a valid safe URL.";
+      errors["declineUrl"] = "Decline redirect URL must be a valid safe URL.";
     }
   }
 
@@ -125,7 +125,7 @@ export function validatePopupConfig(config: PopupWidgetConfig): PopupValidationR
       const start = new Date(config.startDate).getTime();
       const end = new Date(config.endDate).getTime();
       if (!isNaN(start) && !isNaN(end) && start > end) {
-        errors.schedule = "Start date must be earlier than end date.";
+        errors["schedule"] = "Start date must be earlier than end date.";
       }
     }
   }
@@ -133,7 +133,7 @@ export function validatePopupConfig(config: PopupWidgetConfig): PopupValidationR
   // Trigger click selector check
   if (config.triggerType === "click") {
     if (!config.clickSelector || config.clickSelector.trim().length === 0) {
-      errors.clickSelector = "Please specify a CSS selector (e.g. .open-popup-btn or #subscribe-btn).";
+      errors["clickSelector"] = "Please specify a CSS selector (e.g. .open-popup-btn or #subscribe-btn).";
     }
   }
 

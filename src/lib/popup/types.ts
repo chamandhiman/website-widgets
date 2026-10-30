@@ -1,9 +1,14 @@
 export type PopupType =
+  | "classic"
   | "center"
-  | "newsletter"
+  | "hero-image"
   | "image"
-  | "bottom-small"
+  | "split"
+  | "discount"
+  | "minimal"
+  | "newsletter"
   | "slide-in"
+  | "bottom-small"
   | "exit-intent"
   | "announcement"
   | "video"
@@ -41,6 +46,11 @@ export interface PopupWidgetConfig {
   showIcon: boolean;
   iconName: string;
   footerText: string;
+
+  // Offer / Discount & Badge
+  couponCode?: string | undefined;
+  discountBadge?: string | undefined;
+  disclaimerText?: string | undefined;
 
   // Newsletter specific
   emailPlaceholder: string;
@@ -139,6 +149,9 @@ export const DEFAULT_POPUP_CONFIG: PopupWidgetConfig = {
   showIcon: false,
   iconName: "gift",
   footerText: "*Valid for new customers on orders over $50",
+  couponCode: "WELCOME20",
+  discountBadge: "20% OFF",
+  disclaimerText: "*Valid for new customers on orders over $50",
 
   emailPlaceholder: "Enter your email address...",
   newsletterButtonText: "Subscribe Now",

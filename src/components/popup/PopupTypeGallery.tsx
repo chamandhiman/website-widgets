@@ -77,10 +77,10 @@ export const PopupTypeGallery: FC<PopupTypeGalleryProps> = ({
 // Realistic miniature illustrations matching mockup designs
 function TemplateMiniaturePreview({ id }: { id: PopupType }) {
   switch (id) {
+    case "classic":
     case "center":
       return (
         <div className="flex flex-col items-center justify-center w-full h-full bg-white rounded shadow-2xs p-1">
-          {/* Gift Box with Ribbon & Confetti */}
           <div className="relative flex items-center justify-center">
             <span className="text-xl">🎁</span>
             <span className="absolute -top-1 -right-2 text-[8px]">✨</span>
@@ -91,16 +91,7 @@ function TemplateMiniaturePreview({ id }: { id: PopupType }) {
         </div>
       );
 
-    case "newsletter":
-      return (
-        <div className="flex flex-col items-center justify-center w-full h-full bg-white rounded shadow-2xs p-1.5">
-          <span className="text-xs">✉️</span>
-          <span className="text-[7px] font-bold text-gray-800 mt-0.5">Join Our Newsletter</span>
-          <div className="h-2 w-full max-w-[56px] border border-gray-300 rounded-xs bg-gray-50 mt-1" />
-          <div className="h-1.5 w-10 bg-purple-600 rounded-full mt-0.5" />
-        </div>
-      );
-
+    case "hero-image":
     case "image":
       return (
         <div className="flex flex-col items-center justify-center w-full h-full bg-gradient-to-br from-amber-100 to-orange-200 rounded shadow-2xs p-1 relative overflow-hidden">
@@ -109,6 +100,39 @@ function TemplateMiniaturePreview({ id }: { id: PopupType }) {
           </div>
           <span className="text-2xl mt-1">🛍️</span>
           <div className="h-1.5 w-10 bg-rose-600 rounded-full mt-0.5" />
+        </div>
+      );
+
+    case "split":
+      return (
+        <div className="flex w-full h-full bg-white rounded shadow-2xs overflow-hidden">
+          <div className="w-[45%] h-full bg-gradient-to-br from-indigo-500 to-purple-700 flex items-center justify-center text-white text-xs">
+            💎
+          </div>
+          <div className="w-[55%] p-1 flex flex-col justify-center">
+            <span className="text-[5px] font-bold text-purple-600">VIP</span>
+            <span className="text-[6px] font-bold text-gray-800 leading-tight">Club</span>
+            <div className="h-1.5 w-8 bg-gray-900 rounded-full mt-0.5" />
+          </div>
+        </div>
+      );
+
+    case "discount":
+      return (
+        <div className="flex flex-col items-center justify-center w-full h-full bg-white rounded shadow-2xs p-1 text-center">
+          <span className="px-1 py-0.2 rounded-full bg-amber-100 text-amber-700 text-[5px] font-bold">25% OFF</span>
+          <span className="text-[6px] font-bold text-gray-800 mt-0.5">Sale</span>
+          <div className="border border-dashed border-amber-500 bg-amber-50 px-1 py-0.2 rounded-xs font-mono text-[5px] font-bold text-amber-700">SAVE25</div>
+          <div className="h-1 w-8 bg-amber-500 rounded-full mt-0.5" />
+        </div>
+      );
+
+    case "minimal":
+      return (
+        <div className="flex flex-col items-center justify-center w-full h-full bg-stone-50 border border-stone-200 rounded shadow-2xs p-1 text-center">
+          <span className="text-[5px] uppercase tracking-widest text-stone-500">Preview</span>
+          <span className="text-[6px] font-serif font-semibold text-stone-800 mt-0.5">Collection</span>
+          <div className="h-1 w-8 bg-stone-800 rounded-xs mt-0.5" />
         </div>
       );
 

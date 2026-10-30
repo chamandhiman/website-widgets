@@ -1,195 +1,232 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
-  LayoutDashboard,
-  Grid3x3,
+  Home,
+  LayoutGrid,
   Boxes,
   LayoutTemplate,
-  Plug,
+  Link2,
   Settings,
-  Waves,
-  Menu,
   X,
-  Sparkles,
+  Crown,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { StudioTopNav } from "./StudioTopNav";
 import { AuthGuard } from "@/lib/auth";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+  TooltipProvider,
+} from "@/components/ui/tooltip";
 
-const NAV = [
+const NAV_ITEMS = [
   {
     to: "/dashboard",
     label: "Dashboard",
-    icon: LayoutDashboard,
-    iconColor: "text-blue-500 dark:text-blue-400",
-    activeClass: "bg-gradient-to-r from-blue-500/15 via-indigo-500/10 to-transparent text-blue-700 dark:text-blue-300 border-blue-600",
+    icon: Home,
   },
   {
     to: "/widgets",
     label: "All Widgets",
-    icon: Grid3x3,
-    iconColor: "text-purple-500 dark:text-purple-400",
-    activeClass: "bg-gradient-to-r from-purple-500/15 via-violet-500/10 to-transparent text-purple-700 dark:text-purple-300 border-purple-600",
+    icon: LayoutGrid,
   },
   {
     to: "/my-widgets",
     label: "My Widgets",
     icon: Boxes,
-    iconColor: "text-emerald-500 dark:text-emerald-400",
-    activeClass: "bg-gradient-to-r from-emerald-500/15 via-teal-500/10 to-transparent text-emerald-700 dark:text-emerald-300 border-emerald-600",
   },
   {
     to: "/templates",
     label: "Templates",
     icon: LayoutTemplate,
-    iconColor: "text-amber-500 dark:text-amber-400",
-    activeClass: "bg-gradient-to-r from-amber-500/15 via-orange-500/10 to-transparent text-amber-700 dark:text-amber-300 border-amber-600",
   },
   {
     to: "/integrations",
     label: "Integrations",
-    icon: Plug,
-    iconColor: "text-pink-500 dark:text-pink-400",
-    activeClass: "bg-gradient-to-r from-pink-500/15 via-rose-500/10 to-transparent text-pink-700 dark:text-pink-300 border-pink-600",
+    icon: Link2,
   },
   {
     to: "/settings",
     label: "Settings",
     icon: Settings,
-    iconColor: "text-cyan-500 dark:text-cyan-400",
-    activeClass: "bg-gradient-to-r from-cyan-500/15 via-sky-500/10 to-transparent text-cyan-700 dark:text-cyan-300 border-cyan-600",
   },
 ] as const;
 
 export function StudioLayout({ children }: { children: ReactNode }) {
-  const path = useRouterState({ select: (s) => s.location.pathname });
-  const [open, setOpen] = useState(false);
+  const rawPath = useRouterState({ select: (s) => s.location?.pathname || "" }) || "";
+  const path = typeof rawPath === "string" ? rawPath : (rawPath as any)?.pathname || "/dashboard";
 
-  const brand = (
-    <Link to="/" className="flex items-center gap-2.5 px-2 font-bold tracking-tight group">
-      <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-tr from-purple-600 via-indigo-600 to-pink-500 text-white shadow-md shadow-purple-500/30 transition-transform group-hover:scale-105">
-        <Waves className="h-5 w-5" />
-      </span>
-      <div className="flex flex-col">
-        <span className="bg-gradient-to-r from-purple-700 via-indigo-600 to-pink-600 bg-clip-text text-lg font-black tracking-tight text-transparent dark:from-purple-400 dark:via-indigo-300 dark:to-pink-400">
-          WebToolOcean
-        </span>
-        <span className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground -mt-1">
-          Widget Studio
-        </span>
-      </div>
-    </Link>
-  );
+  // Sidebar remains permanently collapsed at fixed width (~68px). No hover expansion.
+  const [mobileOpen, setMobileOpen] = useState(false);
 
-  const nav = (
-    <nav className="flex flex-col gap-1.5">
-      {NAV.map((n) => {
-        const active = n.to === "/" ? path === "/" : path.startsWith(n.to);
-        return (
-          <Link
-            key={n.to}
-            to={n.to}
-            onClick={() => setOpen(false)}
-            className={cn(
-              "group relative flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-all duration-200",
-              active
-                ? cn("border-l-4 font-semibold shadow-2xs", n.activeClass)
-                : "text-muted-foreground hover:bg-muted/70 hover:text-foreground hover:translate-x-0.5"
-            )}
-          >
-            <span
-              className={cn(
-                "grid h-7 w-7 place-items-center rounded-lg transition-transform group-hover:scale-110",
-                active
-                  ? "bg-white/80 dark:bg-card shadow-2xs"
-                  : "bg-muted/50"
-              )}
-            >
-              <n.icon className={cn("h-4 w-4 transition-colors", n.iconColor)} />
-            </span>
-            <span className="leading-none">{n.label}</span>
-          </Link>
-        );
-      })}
-    </nav>
-  );
-
-  // Landing page and Login page are standalone full-page routes (no studio layout)
+  // Standalone pages like /login or marketing / do not render the studio frame
   if (path === "/" || path === "/login") {
     return <>{children}</>;
   }
 
   return (
     <AuthGuard>
-      <div className="relative flex min-h-screen w-full bg-background overflow-x-clip selection:bg-purple-500/20">
-        {/* ================= AMBIENT COLORFUL GRADIENT GLOWS ================= */}
-        <div className="pointer-events-none fixed -top-40 -left-40 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-purple-500/12 via-indigo-500/8 to-transparent blur-3xl" />
-        <div className="pointer-events-none fixed top-1/4 right-0 h-[600px] w-[600px] rounded-full bg-gradient-to-bl from-blue-500/12 via-cyan-500/8 to-transparent blur-3xl" />
-        <div className="pointer-events-none fixed -bottom-40 left-1/3 h-[500px] w-[500px] rounded-full bg-gradient-to-tr from-pink-500/10 via-amber-500/8 to-transparent blur-3xl" />
+      <div className="flex min-h-screen w-full flex-col bg-[#f8fafc] text-slate-900 dark:bg-zinc-950 dark:text-zinc-100 font-sans">
+        {/* ================= 1. COMMON TOP NAVIGATION BAR ================= */}
+        {/* Visible across main application pages, independent of left sidebar */}
+        <StudioTopNav onOpenMobileNav={() => setMobileOpen(true)} />
 
-      {/* ================= DESKTOP SIDEBAR ================= */}
-      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col gap-6 border-r border-border/70 bg-card/85 backdrop-blur-xl p-5 md:flex z-10 shadow-xs">
-        {brand}
-        {nav}
+        {/* ================= BODY WRAPPER: SIDEBAR + CONTENT ================= */}
+        <div className="relative flex flex-1 w-full min-w-0">
+          {/* Fixed-width spacer so main workspace content stays 100% stable */}
+          <div className="hidden md:block w-[68px] shrink-0" />
 
-        {/* Colorful Bottom Widget Studio Pro Card */}
-        <div className="mt-auto rounded-2xl border border-purple-500/20 bg-gradient-to-br from-purple-500/10 via-indigo-500/5 to-pink-500/10 p-4 text-xs shadow-xs relative overflow-hidden">
-          <div className="flex items-center gap-2 mb-1.5">
-            <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="font-bold text-foreground tracking-tight flex items-center gap-1">
-              <Sparkles className="h-3 w-3 text-purple-500" />
-              Widget Studio
-            </span>
-          </div>
-          <p className="text-[11px] leading-relaxed text-muted-foreground">
-            Fast, zero-code widgets running locally in your browser.
-          </p>
-        </div>
-      </aside>
-
-      {/* ================= MOBILE SIDEBAR ================= */}
-      {open && (
-        <div
-          className="fixed inset-0 z-40 bg-foreground/40 backdrop-blur-xs md:hidden"
-          onClick={() => setOpen(false)}
-        >
-          <aside
-            className="flex h-full w-64 flex-col gap-6 bg-card p-5 shadow-2xl border-r"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between">
-              {brand}
-              <button
-                onClick={() => setOpen(false)}
-                aria-label="Close menu"
-                className="rounded-lg p-1 text-muted-foreground hover:bg-muted"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            {nav}
-          </aside>
-        </div>
-      )}
-      {/* ================= MAIN CONTENT ================= */}
-      <div className="relative z-1 flex min-w-0 flex-1 flex-col">
-        {!path.startsWith("/editor") ? (
-          <StudioTopNav onOpenMobileNav={() => setOpen(true)} />
-        ) : (
-          <header className="flex h-14 items-center gap-3 border-b border-border/70 bg-card/80 backdrop-blur-md px-4 md:hidden">
-            <button
-              onClick={() => setOpen(true)}
-              aria-label="Open menu"
-              className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+          {/* ================= 2. BLACK LEFT NAVIGATION SIDEBAR ================= */}
+          {/* Permanently collapsed icon-only sidebar (68px) with professional hover tooltips */}
+          <TooltipProvider delayDuration={100} skipDelayDuration={250}>
+            <aside
+              role="complementary"
+              className="fixed top-16 bottom-0 left-0 z-40 hidden md:flex flex-col justify-between bg-[#0e1017] border-r border-zinc-800/80 w-[68px] select-none"
             >
-              <Menu className="h-5 w-5" />
-            </button>
-            {brand}
-          </header>
-        )}
-        <main className="flex-1">{children}</main>
+              {/* Top Section: Navigation items */}
+              <div className="flex flex-col items-center p-3 pt-3.5">
+                {/* Navigation List */}
+                <nav className="flex flex-col gap-2 w-full items-center">
+                  {NAV_ITEMS.map((item) => {
+                    const isActive =
+                      item.to === "/dashboard"
+                        ? path === "/dashboard" || path === "/"
+                        : path.startsWith(item.to);
+
+                    return (
+                      <Tooltip key={item.to}>
+                        <TooltipTrigger asChild>
+                          <Link
+                            to={item.to}
+                            aria-label={item.label}
+                            className={cn(
+                              "group relative flex items-center justify-center rounded-xl transition-colors duration-150 h-11 w-11 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500",
+                              isActive
+                                ? "bg-[#7c3aed] text-white font-semibold shadow-xs"
+                                : "text-zinc-400 hover:text-white hover:bg-zinc-800/60"
+                            )}
+                          >
+                            <item.icon
+                              className={cn(
+                                "h-5 w-5 shrink-0 transition-transform duration-150 group-hover:scale-105",
+                                isActive ? "text-white" : "text-zinc-400 group-hover:text-zinc-200"
+                              )}
+                            />
+                          </Link>
+                        </TooltipTrigger>
+                        <TooltipContent
+                          side="right"
+                          align="center"
+                          sideOffset={14}
+                          showArrow
+                          className="font-medium text-xs whitespace-nowrap shadow-xl"
+                        >
+                          {item.label}
+                        </TooltipContent>
+                      </Tooltip>
+                    );
+                  })}
+                </nav>
+              </div>
+
+              {/* Bottom Section: Upgrade to Pro Button */}
+              <div className="p-3 flex justify-center">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Link
+                      to="/settings"
+                      aria-label="Upgrade to Pro"
+                      className="flex h-11 w-11 items-center justify-center rounded-xl bg-zinc-900/90 border border-zinc-800/90 text-amber-400 hover:bg-zinc-800 hover:text-amber-300 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 shadow-xs"
+                    >
+                      <Crown className="h-5 w-5 fill-amber-400" />
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent
+                    side="right"
+                    align="center"
+                    sideOffset={14}
+                    showArrow
+                    className="font-medium text-xs whitespace-nowrap shadow-xl"
+                  >
+                    Upgrade to Pro
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+            </aside>
+          </TooltipProvider>
+
+          {/* ================= MOBILE DRAWER SIDEBAR ================= */}
+          {mobileOpen && (
+            <div
+              className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs md:hidden"
+              onClick={() => setMobileOpen(false)}
+            >
+              <aside
+                className="flex h-full w-64 flex-col justify-between bg-[#0e1017] p-4 text-white border-r border-zinc-800 shadow-2xl animate-in slide-in-from-left duration-200"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div>
+                  <div className="flex items-center justify-between pb-3 border-b border-zinc-800/80 mb-3">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400">Navigation</span>
+                    <button
+                      onClick={() => setMobileOpen(false)}
+                      className="p-1 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  </div>
+
+                  <nav className="flex flex-col gap-1.5">
+                    {NAV_ITEMS.map((item) => {
+                      const isActive =
+                        item.to === "/dashboard"
+                          ? path === "/dashboard" || path === "/"
+                          : path.startsWith(item.to);
+
+                      return (
+                        <Link
+                          key={item.to}
+                          to={item.to}
+                          onClick={() => setMobileOpen(false)}
+                          className={cn(
+                            "flex items-center gap-3 rounded-xl px-3 h-11 text-xs font-medium transition-colors",
+                            isActive
+                              ? "bg-[#7c3aed] text-white font-semibold"
+                              : "text-zinc-400 hover:text-white hover:bg-zinc-800/60"
+                          )}
+                        >
+                          <item.icon className="h-4.5 w-4.5" />
+                          <span>{item.label}</span>
+                        </Link>
+                      );
+                    })}
+                  </nav>
+                </div>
+
+                <div className="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-3 text-center">
+                  <div className="flex items-center justify-center gap-1.5 text-amber-400 mb-1">
+                    <Crown className="h-4 w-4 fill-amber-400" />
+                    <span className="text-xs font-bold text-white">Upgrade to Pro</span>
+                  </div>
+                  <Link
+                    to="/settings"
+                    onClick={() => setMobileOpen(false)}
+                    className="mt-2 block w-full rounded-xl bg-[#7c3aed] py-1.5 text-xs font-bold text-white"
+                  >
+                    Upgrade plan
+                  </Link>
+                </div>
+              </aside>
+            </div>
+          )}
+
+          {/* ================= MAIN CONTENT WORKSPACE ================= */}
+          <main className="flex-1 min-w-0 flex flex-col bg-[#f8fafc] dark:bg-zinc-950">
+            {children}
+          </main>
+        </div>
       </div>
-    </div>
     </AuthGuard>
   );
 }
@@ -217,3 +254,4 @@ export function PageHeader({
     </div>
   );
 }
+

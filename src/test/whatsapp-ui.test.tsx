@@ -105,7 +105,7 @@ describe("WhatsApp UI Components", () => {
     expect(onSize).toHaveBeenCalledWith("small");
   });
 
-  it("WhatsAppInstallModal displays correct embed code with widget id", () => {
+  it("WhatsAppInstallModal renders simplified modal with standard embed script and copy button", () => {
     render(
       <WhatsAppInstallModal
         open={true}
@@ -115,9 +115,10 @@ describe("WhatsApp UI Components", () => {
       />
     );
 
-    expect(screen.getByText("Install WhatsApp Widget")).toBeDefined();
-    expect(screen.getByText("wto_test_999")).toBeDefined();
+    expect(screen.getByText("Install Widget")).toBeDefined();
     expect(screen.getByText(/data-widget-id="wto_test_999"/)).toBeDefined();
     expect(screen.getByText("Copy Code")).toBeDefined();
+    expect(screen.getByText("Done")).toBeDefined();
+    expect(screen.queryByText("Select Your Website Platform")).toBeNull();
   });
 });

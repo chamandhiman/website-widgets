@@ -8,7 +8,8 @@ const TEMPLATES = [
   { title: "Support chat button", type: "whatsapp-chat", note: "Floating WhatsApp button, bottom right." },
   { title: "Product FAQ", type: "faq", note: "Shipping and returns questions, ready to edit." },
   { title: "Flash sale countdown", type: "countdown", note: "Bold countdown boxes for promotions." },
-  { title: "Customer love wall", type: "testimonials", note: "Two-column quotes with avatars." },
+  { title: "Customer love wall", type: "testimonial-slider", note: "Showcase customer reviews in an interactive slider." },
+  { title: "Partner & client showcase", type: "logo-carousel", note: "Display trusted brands and partner logos in a smooth carousel." },
   { title: "Free shipping banner", type: "announcement-bar", note: "Slim promo bar for the top of your site." },
 ];
 

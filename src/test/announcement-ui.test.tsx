@@ -76,7 +76,7 @@ describe("Announcement Bar UI Components", () => {
     expect(screen.getByText("Show Close Button")).toBeDefined();
   });
 
-  it("AnnouncementInstallModal renders widget ID, script snippets, and copy button", () => {
+  it("AnnouncementInstallModal renders simplified modal with standard embed script and copy button", () => {
     render(
       <AnnouncementInstallModal
         open={true}
@@ -86,10 +86,11 @@ describe("Announcement Bar UI Components", () => {
       />
     );
 
-    expect(screen.getByText("Install Announcement Bar")).toBeDefined();
-    expect(screen.getByText("wto_announcement_demo_1")).toBeDefined();
+    expect(screen.getByText("Install Widget")).toBeDefined();
     expect(screen.getByText(/data-widget-id="wto_announcement_demo_1"/)).toBeDefined();
     expect(screen.getByText("Copy Code")).toBeDefined();
+    expect(screen.getByText("Done")).toBeDefined();
+    expect(screen.queryByText("Script Source:")).toBeNull();
   });
 
   it("AnnouncementConfigTabs renders Design and Preferences tabs, template switches, and settings", () => {

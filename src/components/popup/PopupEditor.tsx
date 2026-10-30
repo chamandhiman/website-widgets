@@ -1,13 +1,12 @@
-import { useState, useMemo, type FC } from "react";
+import { useState, type FC } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { PanelTop, Sparkles } from "lucide-react";
+import { PanelTop } from "lucide-react";
 import { toast } from "sonner";
-import { PopupTypeGallery } from "./PopupTypeGallery";
 import { PopupConfigTabs } from "./PopupConfigTabs";
 import { PopupLivePreview } from "./PopupLivePreview";
 import { PopupInstallModal } from "./PopupInstallModal";
 import { WidgetEditorHeader } from "@/components/editor/WidgetEditorHeader";
-import type { PopupWidgetConfig, PopupType } from "@/lib/popup/types";
+import type { PopupWidgetConfig } from "@/lib/popup/types";
 import { DEFAULT_POPUP_CONFIG } from "@/lib/popup/types";
 import { validatePopupConfig } from "@/lib/popup/validation";
 import type { PopupTemplateDefinition } from "@/lib/popup/templates";

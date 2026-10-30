@@ -17,6 +17,14 @@ const SCRIPT_NAME_MAP: Record<string, string> = {
   "popup-widget": "popup.js",
   faq: "faq.js",
   "faq-accordion": "faq.js",
+  countdown: "countdown.js",
+  "countdown-timer": "countdown.js",
+  "event-calendar": "event-calendar.js",
+  calendar: "event-calendar.js",
+  "testimonial-slider": "testimonial-slider.js",
+  testimonials: "testimonial-slider.js",
+  "logo-carousel": "logo-carousel.js",
+  logos: "logo-carousel.js",
 };
 
 const CONFIG_WINDOW_KEY_MAP: Record<string, string> = {
@@ -28,6 +36,14 @@ const CONFIG_WINDOW_KEY_MAP: Record<string, string> = {
   "popup-widget": "WTO_POPUP_CONFIGS",
   faq: "WTO_FAQ_CONFIGS",
   "faq-accordion": "WTO_FAQ_CONFIGS",
+  countdown: "WTO_COUNTDOWN_CONFIGS",
+  "countdown-timer": "WTO_COUNTDOWN_CONFIGS",
+  "event-calendar": "WTO_EVENT_CALENDAR_CONFIGS",
+  calendar: "WTO_EVENT_CALENDAR_CONFIGS",
+  "testimonial-slider": "WTO_TESTIMONIAL_CONFIGS",
+  testimonials: "WTO_TESTIMONIAL_CONFIGS",
+  "logo-carousel": "WTO_LOGO_CAROUSEL_CONFIGS",
+  logos: "WTO_LOGO_CAROUSEL_CONFIGS",
 };
 
 const WIDGET_DISPLAY_NAME_MAP: Record<string, string> = {
@@ -39,6 +55,14 @@ const WIDGET_DISPLAY_NAME_MAP: Record<string, string> = {
   "popup-widget": "Popup",
   faq: "FAQ Accordion",
   "faq-accordion": "FAQ Accordion",
+  countdown: "Countdown Timer",
+  "countdown-timer": "Countdown Timer",
+  "event-calendar": "Event Calendar",
+  calendar: "Event Calendar",
+  "testimonial-slider": "Testimonial Slider",
+  testimonials: "Testimonial Slider",
+  "logo-carousel": "Logo Carousel",
+  logos: "Logo Carousel",
 };
 
 /**

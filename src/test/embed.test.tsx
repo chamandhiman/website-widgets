@@ -12,10 +12,12 @@ import { WhatsAppInstallModal } from "@/components/whatsapp/WhatsAppInstallModal
 import { AnnouncementInstallModal } from "@/components/announcement/AnnouncementInstallModal";
 import { PopupInstallModal } from "@/components/popup/PopupInstallModal";
 import { FaqInstallModal } from "@/components/faq/FaqInstallModal";
+import { CountdownInstallModal } from "@/components/countdown/CountdownInstallModal";
 import { DEFAULT_WHATSAPP_CONFIG } from "@/lib/whatsapp/types";
 import { DEFAULT_ANNOUNCEMENT_CONFIG } from "@/lib/announcement/types";
 import { DEFAULT_POPUP_CONFIG } from "@/lib/popup/types";
 import { DEFAULT_FAQ_CONFIG } from "@/lib/faq/types";
+import { DEFAULT_COUNTDOWN_CONFIG } from "@/lib/countdown/types";
 
 describe("Central Embed URL and Snippet Generator", () => {
   it("uses the exact required base domain and embed path", () => {
@@ -173,4 +175,42 @@ describe("Central Embed URL and Snippet Generator", () => {
       screen.getByText(/https:\/\/cdn\.widgets\.webtoolocean\.com\/embed\/faq\.js/)
     ).toBeInTheDocument();
   });
+
+  it("CountdownInstallModal renders simplified modal with standard countdown.js embed script and primary Done button", () => {
+    render(
+      <CountdownInstallModal
+        open={true}
+        onOpenChange={() => {}}
+        widgetId="wto_test_countdown_123"
+        config={DEFAULT_COUNTDOWN_CONFIG}
+      />
+    );
+
+    // Title & description
+    expect(screen.getByText("Install Widget")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Copy this code and paste it into your website page where you want the widget to appear."
+      )
+    ).toBeInTheDocument();
+
+    // Standard embed script with dynamic widget ID & production CDN
+    expect(
+      screen.getByText(/https:\/\/cdn\.widgets\.webtoolocean\.com\/embed\/countdown\.js/)
+    ).toBeInTheDocument();
+    expect(screen.getByText(/data-widget-id="wto_test_countdown_123"/)).toBeInTheDocument();
+
+    // Copy Code & Action Buttons
+    expect(screen.getByText("Copy Code")).toBeInTheDocument();
+    expect(screen.getByText("Cancel")).toBeInTheDocument();
+    const doneButton = screen.getByText("Done");
+    expect(doneButton).toBeInTheDocument();
+    expect(doneButton.className).toContain("bg-purple-600");
+
+    // Technical clutter removed completely
+    expect(screen.queryByText("Script Source:")).toBeNull();
+    expect(screen.queryByText("Embed Mode:")).toBeNull();
+    expect(screen.queryByText("Select Your Website Platform")).toBeNull();
+  });
 });
+
