@@ -94,6 +94,32 @@ describe("Complete Dashboard UI/UX Redesign Tests", () => {
       expect(aside).toHaveClass("w-[68px]");
     });
 
+    it("renders hamburger menu icon above dashboard and toggles between collapsed and expanded states", () => {
+      render(
+        <StudioLayout>
+          <div>Workspace Content</div>
+        </StudioLayout>
+      );
+
+      const aside = screen.getByRole("complementary");
+      expect(aside).toHaveClass("w-[68px]");
+
+      // Hamburger button at top of sidebar
+      const toggleBtn = screen.getByRole("button", { name: /expand sidebar/i });
+      expect(toggleBtn).toBeInTheDocument();
+
+      // Click hamburger icon to expand
+      fireEvent.click(toggleBtn);
+      expect(aside).toHaveClass("w-60");
+      expect(screen.getByText("Collapse")).toBeInTheDocument();
+
+      // Click again to collapse
+      const collapseBtn = screen.getByRole("button", { name: /collapse sidebar/i });
+      fireEvent.click(collapseBtn);
+      expect(aside).toHaveClass("w-[68px]");
+      expect(screen.queryByText("Collapse")).not.toBeInTheDocument();
+    });
+
     it("renders navigation items with accessible labels", () => {
       render(
         <StudioLayout>

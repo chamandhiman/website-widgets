@@ -6,13 +6,13 @@ import "@/landing.css";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "WebToolOcean Widget Studio – Add Website Widgets with One Snippet" },
+      { title: "Website Widgets by WebToolOcean – Add Website Widgets with One Snippet" },
       {
         name: "description",
         content:
           "Customizable website widgets: WhatsApp chat, Google reviews, countdown timers, FAQ, popups and more. Try them live, then embed with a single JavaScript snippet.",
       },
-      { property: "og:title", content: "WebToolOcean Widget Studio – Add Website Widgets with One Snippet" },
+      { property: "og:title", content: "Website Widgets by WebToolOcean – Add Website Widgets with One Snippet" },
       {
         property: "og:description",
         content:
@@ -222,10 +222,12 @@ function LandingPage() {
     <div className="landing-page">
       {/* ===================== HEADER ===================== */}
       <header className="hd">
-        <a className="logo" href="#top">
-          <span className="logo-mark">≋</span>
-          <b>WebToolOcean</b>
-          <small>Widget Studio</small>
+        <a className="logo" href="#top" aria-label="Website Widgets by WebToolOcean">
+          <img
+            src="/logo.png"
+            alt="Website Widgets by WebToolOcean"
+            className="landing-logo-img"
+          />
         </a>
         <nav aria-label="Main">
           <a href="#try">Try it live</a>
@@ -659,7 +661,16 @@ function LandingPage() {
       {/* ===================== FOOTER ===================== */}
       <footer className="ft">
         <div className="wrap">
-          <p>© {new Date().getFullYear()} WebToolOcean Widget Studio</p>
+          <div className="ft-brand">
+            <a href="#top" aria-label="Website Widgets">
+              <img
+                src="/logo.png"
+                alt="Website Widgets by WebToolOcean"
+                className="landing-footer-logo"
+              />
+            </a>
+          </div>
+          <p>© {new Date().getFullYear()} Website Widgets by WebToolOcean</p>
           <p>
             <a href="#">Privacy Policy</a>
             <a href="#">Terms of Service</a>

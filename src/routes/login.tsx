@@ -12,7 +12,7 @@ export const Route = createFileRoute("/login")({
   }),
   head: () => ({
     meta: [
-      { title: "Sign In — WebToolOcean Widget Studio" },
+      { title: "Sign In — Website Widgets by WebToolOcean" },
       { name: "description", content: "Sign in to create and manage your website widgets." },
     ],
   }),
@@ -182,18 +182,12 @@ function LoginPage() {
           <div className="px-7 pt-7 pb-8">
             {/* Logo & branding */}
             <div className="mb-6 flex flex-col items-center">
-              <Link to="/" className="group mb-5 flex items-center gap-2.5">
-                <span className="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-tr from-purple-600 via-indigo-600 to-pink-500 text-white shadow-lg shadow-purple-500/30 transition-transform group-hover:scale-105">
-                  <Waves className="h-6 w-6" />
-                </span>
-                <div className="flex flex-col">
-                  <span className="bg-gradient-to-r from-purple-700 via-indigo-600 to-pink-600 bg-clip-text text-xl font-black tracking-tight text-transparent">
-                    WebToolOcean
-                  </span>
-                  <span className="text-[10px] uppercase tracking-widest font-semibold text-slate-400 -mt-0.5">
-                    Widget Studio
-                  </span>
-                </div>
+              <Link to="/" className="group mb-5 flex items-center">
+                <img
+                  src="/logo.png"
+                  alt="Website Widgets by WebToolOcean"
+                  className="h-10 w-auto object-contain transition-opacity group-hover:opacity-90"
+                />
               </Link>
 
               {mode === "signin" && (

@@ -81,10 +81,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "WebToolOcean Widget Studio" },
+      { title: "Website Widgets by WebToolOcean" },
       { name: "description", content: "Build, customize and install website widgets." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "WebToolOcean Widget Studio" },
+      { property: "og:title", content: "Website Widgets by WebToolOcean" },
       { property: "og:description", content: "Build, customize and install website widgets." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

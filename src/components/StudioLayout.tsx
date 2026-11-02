@@ -8,6 +8,7 @@ import {
   Settings,
   X,
   Crown,
+  Menu,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
@@ -57,7 +58,8 @@ export function StudioLayout({ children }: { children: ReactNode }) {
   const rawPath = useRouterState({ select: (s) => s.location?.pathname || "" }) || "";
   const path = typeof rawPath === "string" ? rawPath : (rawPath as any)?.pathname || "/dashboard";
 
-  // Sidebar remains permanently collapsed at fixed width (~68px). No hover expansion.
+  // Sidebar toggle state (collapsed by default at 68px, expandable to 240px)
+  const [isExpanded, setIsExpanded] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   // Standalone pages like /login or marketing / do not render the studio frame
@@ -74,18 +76,60 @@ export function StudioLayout({ children }: { children: ReactNode }) {
 
         {/* ================= BODY WRAPPER: SIDEBAR + CONTENT ================= */}
         <div className="relative flex flex-1 w-full min-w-0">
-          {/* Fixed-width spacer so main workspace content stays 100% stable */}
-          <div className="hidden md:block w-[68px] shrink-0" />
+          {/* Fixed-width spacer so main workspace content stays 100% stable with smooth transition */}
+          <div
+            className={cn(
+              "hidden md:block shrink-0 transition-[width] duration-200 ease-in-out",
+              isExpanded ? "w-60" : "w-[68px]"
+            )}
+          />
 
           {/* ================= 2. BLACK LEFT NAVIGATION SIDEBAR ================= */}
-          {/* Permanently collapsed icon-only sidebar (68px) with professional hover tooltips */}
+          {/* Collapsed by default (68px), expandable on toggle (240px) with smooth transition */}
           <TooltipProvider delayDuration={100} skipDelayDuration={250}>
             <aside
               role="complementary"
-              className="fixed top-16 bottom-0 left-0 z-40 hidden md:flex flex-col justify-between bg-[#0e1017] border-r border-zinc-800/80 w-[68px] select-none"
+              className={cn(
+                "fixed top-16 bottom-0 left-0 z-40 hidden md:flex flex-col justify-between bg-[#0e1017] border-r border-zinc-800/80 select-none transition-[width] duration-200 ease-in-out",
+                isExpanded ? "w-60" : "w-[68px]"
+              )}
             >
-              {/* Top Section: Navigation items */}
+              {/* Top Section: Hamburger toggle + Navigation items */}
               <div className="flex flex-col items-center p-3 pt-3.5">
+                {/* 1. Hamburger Menu Icon (Top of sidebar, above Dashboard) */}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      onClick={() => setIsExpanded((prev) => !prev)}
+                      aria-label={isExpanded ? "Collapse sidebar" : "Expand sidebar"}
+                      aria-expanded={isExpanded}
+                      className={cn(
+                        "group relative flex items-center rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-800/60 transition-colors duration-150 h-11 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 mb-2 cursor-pointer",
+                        isExpanded ? "w-full px-3 gap-3 justify-start" : "w-11 justify-center"
+                      )}
+                    >
+                      <Menu className="h-5 w-5 shrink-0 transition-transform duration-150 group-hover:scale-105" />
+                      {isExpanded && (
+                        <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+                          Collapse
+                        </span>
+                      )}
+                    </button>
+                  </TooltipTrigger>
+                  {!isExpanded && (
+                    <TooltipContent
+                      side="right"
+                      align="center"
+                      sideOffset={14}
+                      showArrow
+                      className="font-medium text-xs whitespace-nowrap shadow-xl"
+                    >
+                      Expand sidebar
+                    </TooltipContent>
+                  )}
+                </Tooltip>
+
                 {/* Navigation List */}
                 <nav className="flex flex-col gap-2 w-full items-center">
                   {NAV_ITEMS.map((item) => {
@@ -101,7 +145,8 @@ export function StudioLayout({ children }: { children: ReactNode }) {
                             to={item.to}
                             aria-label={item.label}
                             className={cn(
-                              "group relative flex items-center justify-center rounded-xl transition-colors duration-150 h-11 w-11 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500",
+                              "group relative flex items-center rounded-xl transition-colors duration-150 h-11 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500",
+                              isExpanded ? "w-full px-3 gap-3 justify-start" : "w-11 justify-center",
                               isActive
                                 ? "bg-[#7c3aed] text-white font-semibold shadow-xs"
                                 : "text-zinc-400 hover:text-white hover:bg-zinc-800/60"
@@ -113,17 +158,31 @@ export function StudioLayout({ children }: { children: ReactNode }) {
                                 isActive ? "text-white" : "text-zinc-400 group-hover:text-zinc-200"
                               )}
                             />
+                            {isExpanded && (
+                              <span
+                                className={cn(
+                                  "text-xs truncate transition-opacity duration-150",
+                                  isActive
+                                    ? "font-semibold text-white"
+                                    : "font-medium text-zinc-300 group-hover:text-white"
+                                )}
+                              >
+                                {item.label}
+                              </span>
+                            )}
                           </Link>
                         </TooltipTrigger>
-                        <TooltipContent
-                          side="right"
-                          align="center"
-                          sideOffset={14}
-                          showArrow
-                          className="font-medium text-xs whitespace-nowrap shadow-xl"
-                        >
-                          {item.label}
-                        </TooltipContent>
+                        {!isExpanded && (
+                          <TooltipContent
+                            side="right"
+                            align="center"
+                            sideOffset={14}
+                            showArrow
+                            className="font-medium text-xs whitespace-nowrap shadow-xl"
+                          >
+                            {item.label}
+                          </TooltipContent>
+                        )}
                       </Tooltip>
                     );
                   })}
@@ -137,20 +196,30 @@ export function StudioLayout({ children }: { children: ReactNode }) {
                     <Link
                       to="/settings"
                       aria-label="Upgrade to Pro"
-                      className="flex h-11 w-11 items-center justify-center rounded-xl bg-zinc-900/90 border border-zinc-800/90 text-amber-400 hover:bg-zinc-800 hover:text-amber-300 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 shadow-xs"
+                      className={cn(
+                        "flex items-center rounded-xl bg-zinc-900/90 border border-zinc-800/90 text-amber-400 hover:bg-zinc-800 hover:text-amber-300 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 shadow-xs",
+                        isExpanded ? "w-full px-3 py-2.5 gap-3 justify-start" : "h-11 w-11 justify-center"
+                      )}
                     >
-                      <Crown className="h-5 w-5 fill-amber-400" />
+                      <Crown className="h-5 w-5 shrink-0 fill-amber-400" />
+                      {isExpanded && (
+                        <span className="text-xs font-bold text-white whitespace-nowrap">
+                          Upgrade to Pro
+                        </span>
+                      )}
                     </Link>
                   </TooltipTrigger>
-                  <TooltipContent
-                    side="right"
-                    align="center"
-                    sideOffset={14}
-                    showArrow
-                    className="font-medium text-xs whitespace-nowrap shadow-xl"
-                  >
-                    Upgrade to Pro
-                  </TooltipContent>
+                  {!isExpanded && (
+                    <TooltipContent
+                      side="right"
+                      align="center"
+                      sideOffset={14}
+                      showArrow
+                      className="font-medium text-xs whitespace-nowrap shadow-xl"
+                    >
+                      Upgrade to Pro
+                    </TooltipContent>
+                  )}
                 </Tooltip>
               </div>
             </aside>

@@ -131,7 +131,7 @@ function DashboardPage() {
             </span>
           </div>
           <div className="mt-3 text-3xl font-black text-slate-900 dark:text-zinc-100">{publishedCount}</div>
-          <div className="mt-1 text-[11px] text-emerald-600 font-medium">Connected with website URLs</div>
+          <div className="mt-1 text-[11px] text-emerald-600 font-medium">Active and embed-ready</div>
         </div>
 
         {/* Drafts */}

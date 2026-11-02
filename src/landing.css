@@ -79,6 +79,15 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  text-decoration: none;
+}
+
+.landing-page .landing-logo-img {
+  height: 38px;
+  width: auto;
+  max-width: 280px;
+  object-fit: contain;
+  display: block;
 }
 
 .landing-page .logo-mark {
@@ -1091,8 +1100,17 @@
 .landing-page .ft .wrap {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 16px;
+}
+
+.landing-page .landing-footer-logo {
+  height: 28px;
+  width: auto;
+  max-width: 220px;
+  object-fit: contain;
+  display: block;
 }
 
 .landing-page .ft a {
