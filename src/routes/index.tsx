@@ -3,6 +3,7 @@ import { useEffect, useState, useMemo, useRef } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import { loadSaved } from "@/lib/widgets";
+import { LoginDropdown } from "@/components/LoginDropdown";
 import {
   Search,
   ArrowRight,
@@ -716,14 +717,9 @@ function LandingPage() {
                 )}
               </div>
             ) : (
-              /* Logged-out state: Sign In and Get Started inside the floating pill */
+              /* Logged-out state: Log in dropdown and Get Started button */
               <div className="flex items-center gap-3">
-                <Link
-                  to="/login"
-                  className="text-sm font-semibold text-slate-700 hover:text-slate-900 px-3.5 py-1.5 rounded-full hover:bg-slate-100/70 transition-colors cursor-pointer"
-                >
-                  Sign In
-                </Link>
+                <LoginDropdown buttonText="Log in" />
                 <Link
                   to="/login"
                   className="text-sm font-semibold text-white px-4 py-2 rounded-full bg-gradient-to-r from-purple-600 via-violet-600 to-pink-500 hover:opacity-95 shadow-md shadow-purple-500/20 transition-all hover:scale-[1.02] cursor-pointer"

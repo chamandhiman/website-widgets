@@ -76,15 +76,26 @@ describe("Premium SaaS Landing Page Redesign", () => {
     expect(screen.getByText("Sign out")).toBeInTheDocument();
   });
 
-  it("renders Sign In and Get Started buttons when user signs out or is logged out", () => {
+  it("renders Log in dropdown button and Get Started button when user signs out or is logged out", () => {
     currentAuthUser = null;
     sessionStorage.setItem("ww_logged_out", "true");
     const LandingComponent = Route.options.component!;
     const { container } = render(<LandingComponent />);
 
     const header = container.querySelector("header")!;
-    expect(within(header).getByRole("link", { name: "Sign In" })).toBeInTheDocument();
+    const logInBtn = within(header).getByRole("button", { name: "Log in" });
+    expect(logInBtn).toBeInTheDocument();
     expect(within(header).getByRole("link", { name: "Get Started" })).toBeInTheDocument();
+
+    // Clicking Log in opens modern Google sign-in dropdown
+    fireEvent.click(logInBtn);
+    expect(screen.getByText("Sign in to your account")).toBeInTheDocument();
+    expect(screen.getByText("WEBTOOLOCEAN")).toBeInTheDocument();
+    expect(screen.getByText("Verified")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Continue with Google/i })).toBeInTheDocument();
+    expect(screen.getByText("OAuth 2.0 Account Chooser")).toBeInTheDocument();
+    expect(screen.getByText("Fast access")).toBeInTheDocument();
+
     sessionStorage.removeItem("ww_logged_out");
   });
 
@@ -101,7 +112,7 @@ describe("Premium SaaS Landing Page Redesign", () => {
     fireEvent.click(signOutBtn);
 
     expect(mockSignOut).toHaveBeenCalled();
-    expect(within(header).getByRole("link", { name: "Sign In" })).toBeInTheDocument();
+    expect(within(header).getByRole("button", { name: "Log in" })).toBeInTheDocument();
     expect(within(header).getByRole("link", { name: "Get Started" })).toBeInTheDocument();
     sessionStorage.removeItem("ww_logged_out");
   });

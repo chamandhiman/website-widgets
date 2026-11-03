@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
+import { LoginDropdown } from "@/components/LoginDropdown";
 import { getPlanUsage, type PlanUsage } from "@/lib/widgets";
 
 const ROUTE_TITLES: Record<string, string> = {
@@ -249,15 +250,7 @@ export function StudioTopNav({ onOpenMobileNav }: StudioTopNavProps) {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigate({ to: "/login" })}
-              className="h-8.5 rounded-xl border-slate-300 px-3.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:border-border dark:text-slate-200 dark:hover:bg-muted"
-            >
-              <User className="mr-1.5 h-3.5 w-3.5 text-purple-600" />
-              Sign In
-            </Button>
+            <LoginDropdown buttonText="Log in" />
           )}
         </div>
       </header>
