@@ -29,7 +29,6 @@ import {
   onAuthStateChanged,
 } from "firebase/auth";
 import { auth, isFirebaseConfigured } from "@/lib/firebase";
-import { useNavigate, useRouterState } from "@tanstack/react-router";
 
 export interface AuthContextValue {
   user: User | null;
@@ -154,24 +153,12 @@ export function useAuth(): AuthContextValue {
 }
 
 /**
- * AuthGuard — renders children only when the user is authenticated.
- * While Firebase is initializing, shows a full-screen loading spinner.
- * When unauthenticated, redirects to /login (preserving the return URL).
+ * AuthGuard — ensures child components render safely without blocking unauthenticated visitors.
+ * Visitors can browse the studio, widgets, templates, settings, and integrations freely.
+ * While Firebase is initializing, shows a clean loading spinner.
  */
 export function AuthGuard({ children }: { children: ReactNode }) {
-  const { user, loading } = useAuth();
-  const navigate = useNavigate();
-  const location = useRouterState({ select: (s) => s.location });
-
-  useEffect(() => {
-    if (!loading && !user) {
-      const destination = location.pathname;
-      navigate({
-        to: "/login",
-        search: { redirect: destination !== "/" && destination !== "/login" ? destination : "/dashboard" },
-      });
-    }
-  }, [user, loading, navigate, location]);
+  const { loading } = useAuth();
 
   if (loading) {
     return (
@@ -182,10 +169,6 @@ export function AuthGuard({ children }: { children: ReactNode }) {
         </div>
       </div>
     );
-  }
-
-  if (!user) {
-    return null; // Will redirect via useEffect above
   }
 
   return <>{children}</>;

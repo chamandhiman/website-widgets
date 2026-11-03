@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, useMemo, useRef } from "react";
+import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import { loadSaved } from "@/lib/widgets";
 import {
@@ -404,6 +405,24 @@ function LandingPage() {
   // Live modal preview state
   const [previewWidget, setPreviewWidget] = useState<LandingWidget | null>(null);
 
+  // Policy & info modal state
+  const [policyModal, setPolicyModal] = useState<"privacy" | "terms" | "cookies" | "about" | null>(null);
+
+  // Handle Add Widget: prompt with a toast if unauthenticated
+  const handleAddWidget = (widgetType: string) => {
+    if (!user) {
+      toast("Please login to create widgets", {
+        description: "Sign in to customize, save, and install widgets on your website.",
+        action: {
+          label: "Sign In",
+          onClick: () => navigate({ to: "/login" }),
+        },
+      });
+      return;
+    }
+    navigate({ to: "/editor/$type", params: { type: widgetType } });
+  };
+
   // Live countdown ticker state: "02:13:56"
   const [timeRemaining, setTimeRemaining] = useState({ hours: 2, minutes: 13, seconds: 56 });
 
@@ -534,9 +553,9 @@ function LandingPage() {
             <Link to="/widgets" className="hover:text-purple-600 transition-colors">
               Widgets
             </Link>
-            <Link to="/settings" className="hover:text-purple-600 transition-colors">
+            <a href="#pricing" className="hover:text-purple-600 transition-colors">
               Pricing
-            </Link>
+            </a>
             <a href="#benefits" className="hover:text-purple-600 transition-colors">
               Help
             </a>
@@ -751,13 +770,13 @@ function LandingPage() {
           >
             Widgets
           </Link>
-          <Link
-            to="/settings"
+          <a
+            href="#pricing"
             onClick={() => setMobileMenuOpen(false)}
             className="block text-base font-semibold text-slate-800 hover:text-purple-600 py-1"
           >
             Pricing
-          </Link>
+          </a>
           <a
             href="#benefits"
             onClick={() => setMobileMenuOpen(false)}
@@ -1285,14 +1304,14 @@ function LandingPage() {
                           <span>Preview</span>
                         </button>
 
-                        <Link
-                          to="/editor/$type"
-                          params={{ type: widget.type }}
-                          className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 text-white text-xs font-bold transition-all shadow-md shadow-purple-500/20 text-center flex items-center justify-center gap-1 hover:scale-[1.02] active:scale-[0.98]"
+                        <button
+                          type="button"
+                          onClick={() => handleAddWidget(widget.type)}
+                          className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 text-white text-xs font-bold transition-all shadow-md shadow-purple-500/20 text-center flex items-center justify-center gap-1 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
                         >
                           <Plus className="h-3.5 w-3.5" />
                           <span>Add Widget</span>
-                        </Link>
+                        </button>
                       </div>
                     </div>
                   );
@@ -1396,7 +1415,174 @@ function LandingPage() {
       </section>
 
       {/* ====================================================================
-          7. FINAL CTA SECTION
+          7. PRICING SECTION
+          ==================================================================== */}
+      <section id="pricing" className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-20 md:mb-28 scroll-mt-24">
+        <div className="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
+          <span className="inline-block text-[11px] font-bold tracking-widest uppercase text-purple-600 bg-purple-100/70 px-3 py-1 rounded-full mb-3">
+            Pricing Plans
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+            Simple, Transparent Pricing
+          </h2>
+          <p className="text-sm sm:text-base text-slate-500 mt-2">
+            Start for free and scale as your traffic grows. No credit card required.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 items-stretch">
+          {/* Free Plan */}
+          <div className="rounded-3xl border border-slate-200/90 bg-white p-7 sm:p-8 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow">
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-lg font-bold text-slate-900">Free Plan</h3>
+              </div>
+              <p className="text-xs text-slate-500 mb-6">
+                Everything you need to try out widgets on your website.
+              </p>
+              <div className="mb-6 flex items-baseline gap-1">
+                <span className="text-4xl font-black text-slate-900">$0</span>
+                <span className="text-xs font-semibold text-slate-500">/ forever</span>
+              </div>
+              <ul className="space-y-3 text-xs text-slate-600">
+                <li className="flex items-center gap-2.5">
+                  <Check className="h-4 w-4 text-emerald-600 shrink-0" />
+                  <span>Up to 10 active widgets</span>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Check className="h-4 w-4 text-emerald-600 shrink-0" />
+                  <span>All standard widget types</span>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Check className="h-4 w-4 text-emerald-600 shrink-0" />
+                  <span>Instant CDN embed script</span>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Check className="h-4 w-4 text-emerald-600 shrink-0" />
+                  <span>Full mobile responsiveness</span>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Check className="h-4 w-4 text-emerald-600 shrink-0" />
+                  <span>Community support</span>
+                </li>
+              </ul>
+            </div>
+            <div className="mt-8 pt-4 border-t border-slate-100">
+              <Link
+                to="/widgets"
+                className="w-full block py-2.5 px-4 rounded-xl border border-slate-200 text-center text-xs font-bold text-slate-800 hover:bg-slate-50 transition-colors"
+              >
+                Get Started Free
+              </Link>
+            </div>
+          </div>
+
+          {/* Pro Plan (Featured) */}
+          <div className="relative rounded-3xl border-2 border-purple-600 bg-gradient-to-b from-purple-50/40 via-white to-white p-7 sm:p-8 flex flex-col justify-between shadow-xl shadow-purple-900/10">
+            <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-purple-600 to-pink-500 text-white px-3.5 py-1 text-[10px] font-bold uppercase tracking-wider shadow-sm">
+              Most Popular
+            </span>
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-lg font-bold text-purple-900">Pro Plan</h3>
+              </div>
+              <p className="text-xs text-slate-500 mb-6">
+                Unlimited power and styling for growing businesses.
+              </p>
+              <div className="mb-6 flex items-baseline gap-1">
+                <span className="text-4xl font-black text-slate-900">$9</span>
+                <span className="text-xs font-semibold text-slate-500">/ month</span>
+              </div>
+              <ul className="space-y-3 text-xs text-slate-700">
+                <li className="flex items-center gap-2.5">
+                  <Check className="h-4 w-4 text-purple-600 font-bold shrink-0" />
+                  <span className="font-semibold text-slate-900">Unlimited website widgets</span>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Check className="h-4 w-4 text-purple-600 font-bold shrink-0" />
+                  <span>All 8+ premium design templates</span>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Check className="h-4 w-4 text-purple-600 font-bold shrink-0" />
+                  <span>Remove "WebToolOcean" watermark</span>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Check className="h-4 w-4 text-purple-600 font-bold shrink-0" />
+                  <span>Priority CDN edge routing & speed</span>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Check className="h-4 w-4 text-purple-600 font-bold shrink-0" />
+                  <span>Custom CSS and fine-tuned themes</span>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Check className="h-4 w-4 text-purple-600 font-bold shrink-0" />
+                  <span>Priority email & chat support</span>
+                </li>
+              </ul>
+            </div>
+            <div className="mt-8 pt-4 border-t border-purple-100">
+              <button
+                type="button"
+                onClick={() => {
+                  toast.success("Thank you for your interest! Pro billing checkout is launching soon.");
+                }}
+                className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 text-white text-xs font-bold shadow-md shadow-purple-500/20 transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+              >
+                Upgrade to Pro
+              </button>
+            </div>
+          </div>
+
+          {/* Agency Plan */}
+          <div className="rounded-3xl border border-slate-200/90 bg-white p-7 sm:p-8 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow">
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-lg font-bold text-slate-900">Agency</h3>
+              </div>
+              <p className="text-xs text-slate-500 mb-6">
+                For digital agencies managing multiple client websites.
+              </p>
+              <div className="mb-6 flex items-baseline gap-1">
+                <span className="text-4xl font-black text-slate-900">$29</span>
+                <span className="text-xs font-semibold text-slate-500">/ month</span>
+              </div>
+              <ul className="space-y-3 text-xs text-slate-600">
+                <li className="flex items-center gap-2.5">
+                  <Check className="h-4 w-4 text-emerald-600 shrink-0" />
+                  <span className="font-semibold text-slate-900">Unlimited client websites</span>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Check className="h-4 w-4 text-emerald-600 shrink-0" />
+                  <span>Multi-account client workspaces</span>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Check className="h-4 w-4 text-emerald-600 shrink-0" />
+                  <span>White-label embed script option</span>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Check className="h-4 w-4 text-emerald-600 shrink-0" />
+                  <span>Dedicated SLA & uptime guarantee</span>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Check className="h-4 w-4 text-emerald-600 shrink-0" />
+                  <span>Dedicated account manager</span>
+                </li>
+              </ul>
+            </div>
+            <div className="mt-8 pt-4 border-t border-slate-100">
+              <a
+                href="mailto:support@webtoolocean.com?subject=Agency%20Plan%20Inquiry"
+                className="w-full block py-2.5 px-4 rounded-xl border border-slate-200 text-center text-xs font-bold text-slate-800 hover:bg-slate-50 transition-colors"
+              >
+                Contact Sales
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ====================================================================
+          8. FINAL CTA SECTION
           ==================================================================== */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-20 md:mb-28">
         <div className="relative rounded-3xl bg-gradient-to-r from-purple-600 via-violet-600 to-pink-500 p-8 sm:p-14 text-center text-white shadow-2xl shadow-purple-900/20 overflow-hidden">
@@ -1508,9 +1694,9 @@ function LandingPage() {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/settings" className="hover:text-purple-600 transition-colors">
+                  <a href="#pricing" className="hover:text-purple-600 transition-colors">
                     Pricing
-                  </Link>
+                  </a>
                 </li>
                 <li>
                   <Link to="/integrations" className="hover:text-purple-600 transition-colors">
@@ -1554,6 +1740,15 @@ function LandingPage() {
               </h4>
               <ul className="space-y-2.5 text-sm text-slate-600">
                 <li>
+                  <button
+                    type="button"
+                    onClick={() => setPolicyModal("about")}
+                    className="hover:text-purple-600 transition-colors text-left cursor-pointer"
+                  >
+                    About Us
+                  </button>
+                </li>
+                <li>
                   <a
                     href="https://webtoolocean.com"
                     target="_blank"
@@ -1580,15 +1775,27 @@ function LandingPage() {
           <div className="pt-8 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
             <p>© 2026 WebToolOcean. All rights reserved.</p>
             <div className="flex items-center gap-6">
-              <a href="#privacy" className="hover:text-purple-600 transition-colors">
+              <button
+                type="button"
+                onClick={() => setPolicyModal("privacy")}
+                className="hover:text-purple-600 transition-colors cursor-pointer"
+              >
                 Privacy Policy
-              </a>
-              <a href="#terms" className="hover:text-purple-600 transition-colors">
+              </button>
+              <button
+                type="button"
+                onClick={() => setPolicyModal("terms")}
+                className="hover:text-purple-600 transition-colors cursor-pointer"
+              >
                 Terms of Service
-              </a>
-              <a href="#cookies" className="hover:text-purple-600 transition-colors">
+              </button>
+              <button
+                type="button"
+                onClick={() => setPolicyModal("cookies")}
+                className="hover:text-purple-600 transition-colors cursor-pointer"
+              >
                 Cookie Policy
-              </a>
+              </button>
             </div>
           </div>
         </div>
@@ -1740,15 +1947,127 @@ function LandingPage() {
                 Close
               </button>
 
-              <Link
-                to="/editor/$type"
-                params={{ type: previewWidget.type }}
-                onClick={() => setPreviewWidget(null)}
-                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 text-white text-xs font-bold shadow-md shadow-purple-500/20 transition-all flex items-center gap-1.5"
+              <button
+                type="button"
+                onClick={() => {
+                  const type = previewWidget.type;
+                  setPreviewWidget(null);
+                  handleAddWidget(type);
+                }}
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 text-white text-xs font-bold shadow-md shadow-purple-500/20 transition-all flex items-center gap-1.5 cursor-pointer"
               >
                 <span>Add & Customize Widget</span>
                 <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
+              </button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* ====================================================================
+          10. LEGAL & ABOUT MODAL DIALOG
+          ==================================================================== */}
+      {policyModal && (
+        <Dialog open={Boolean(policyModal)} onOpenChange={() => setPolicyModal(null)}>
+          <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto p-6 sm:p-8 rounded-3xl border-slate-200 bg-white shadow-2xl">
+            <DialogHeader className="mb-4">
+              <DialogTitle className="text-xl sm:text-2xl font-black text-slate-900">
+                {policyModal === "privacy" && "Privacy Policy"}
+                {policyModal === "terms" && "Terms of Service"}
+                {policyModal === "cookies" && "Cookie Policy"}
+                {policyModal === "about" && "About Website Widgets by WebToolOcean"}
+              </DialogTitle>
+              <DialogDescription className="text-xs text-slate-500">
+                Last updated: November 2026 • WebToolOcean
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-4 text-xs sm:text-sm text-slate-600 leading-relaxed">
+              {policyModal === "privacy" && (
+                <>
+                  <p>
+                    At WebToolOcean, we respect your privacy and are committed to protecting your personal data.
+                    This Privacy Policy explains how our widget services handle information.
+                  </p>
+                  <h4 className="font-bold text-slate-800 text-sm pt-2">Data Collection & Usage</h4>
+                  <p>
+                    When visitors view widgets embedded on client sites, our CDN serves lightweight scripts and assets.
+                    We do not sell personal information or build cross-site tracking profiles. Any information submitted
+                    via contact or form widgets is transmitted securely to the widget owner.
+                  </p>
+                  <h4 className="font-bold text-slate-800 text-sm pt-2">Security</h4>
+                  <p>
+                    All API communications and widget delivery use modern TLS encryption. We maintain strict access
+                    controls and industry-standard security safeguards.
+                  </p>
+                </>
+              )}
+
+              {policyModal === "terms" && (
+                <>
+                  <p>
+                    By using Website Widgets provided by WebToolOcean, you agree to these Terms of Service.
+                  </p>
+                  <h4 className="font-bold text-slate-800 text-sm pt-2">Service Usage</h4>
+                  <p>
+                    You may embed widgets on your authorized domains. You agree not to use the widgets for unlawful
+                    activities, transmitting malicious scripts, or violating third-party intellectual property.
+                  </p>
+                  <h4 className="font-bold text-slate-800 text-sm pt-2">Service Availability</h4>
+                  <p>
+                    We deliver widgets via high-speed global edge networks. We strive for 99.9% uptime and continuous
+                    service enhancements.
+                  </p>
+                </>
+              )}
+
+              {policyModal === "cookies" && (
+                <>
+                  <p>
+                    This Cookie Policy explains how cookies and browser storage are utilized by Website Widgets.
+                  </p>
+                  <h4 className="font-bold text-slate-800 text-sm pt-2">Essential Functionality</h4>
+                  <p>
+                    Some widgets, such as announcement bars and popups, use local browser storage to remember when a
+                    visitor has dismissed a notification so it is not shown repeatedly during the same session.
+                  </p>
+                  <p>
+                    We do not use invasive third-party tracking cookies or store personally identifiable data in cookies.
+                  </p>
+                </>
+              )}
+
+              {policyModal === "about" && (
+                <>
+                  <p>
+                    Website Widgets by WebToolOcean empowers creators, businesses, and agencies to embed
+                    high-converting, responsive interactive widgets onto any website with a single JavaScript snippet.
+                  </p>
+                  <h4 className="font-bold text-slate-800 text-sm pt-2">Our Mission</h4>
+                  <p>
+                    To eliminate complex custom code and heavy plugins by providing modern, lightweight, beautifully
+                    crafted widgets that load in milliseconds and work smoothly across WordPress, Shopify, Webflow,
+                    Squarespace, and custom platforms.
+                  </p>
+                  <h4 className="font-bold text-slate-800 text-sm pt-2">Get in Touch</h4>
+                  <p>
+                    Have questions or custom widget requests? Contact our team at{" "}
+                    <a href="mailto:support@webtoolocean.com" className="text-purple-600 font-bold hover:underline">
+                      support@webtoolocean.com
+                    </a>.
+                  </p>
+                </>
+              )}
+            </div>
+
+            <div className="mt-6 pt-4 border-t border-slate-100 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setPolicyModal(null)}
+                className="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold transition-colors cursor-pointer"
+              >
+                Close
+              </button>
             </div>
           </DialogContent>
         </Dialog>

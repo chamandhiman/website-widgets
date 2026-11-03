@@ -26,6 +26,14 @@ const mockUser = {
 
 let currentAuthUser: any = mockUser;
 const mockSignOut = vi.fn();
+const mockToast = vi.fn();
+
+vi.mock("sonner", () => ({
+  toast: Object.assign((...args: any[]) => mockToast(...args), {
+    success: vi.fn(),
+    error: vi.fn(),
+  }),
+}));
 
 vi.mock("@/lib/auth", () => ({
   useAuth: () => ({
@@ -165,6 +173,36 @@ describe("Premium SaaS Landing Page Redesign", () => {
     expect(screen.getAllByRole("button", { name: /Conversion/i }).length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByRole("button", { name: /Engagement/i }).length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByRole("button", { name: /Utilities/i }).length).toBeGreaterThanOrEqual(1);
+  }, 20000);
+
+  it("renders transparent pricing section with Free, Pro, and Agency plans", () => {
+    const LandingComponent = Route.options.component!;
+    render(<LandingComponent />);
+
+    expect(screen.getByText("Simple, Transparent Pricing")).toBeInTheDocument();
+    expect(screen.getByText("Free Plan")).toBeInTheDocument();
+    expect(screen.getByText("Pro Plan")).toBeInTheDocument();
+    expect(screen.getByText("Agency")).toBeInTheDocument();
+    expect(screen.getByText("$0")).toBeInTheDocument();
+    expect(screen.getByText("$9")).toBeInTheDocument();
+    expect(screen.getByText("$29")).toBeInTheDocument();
+  });
+
+  it("shows toast prompt when unauthenticated user clicks Add Widget", () => {
+    currentAuthUser = null;
+    const LandingComponent = Route.options.component!;
+    render(<LandingComponent />);
+
+    const addWidgetButtons = screen.getAllByRole("button", { name: /Add Widget/i });
+    expect(addWidgetButtons.length).toBeGreaterThan(0);
+    fireEvent.click(addWidgetButtons[0]);
+
+    expect(mockToast).toHaveBeenCalledWith(
+      "Please login to create widgets",
+      expect.objectContaining({
+        description: expect.stringContaining("Sign in to customize"),
+      })
+    );
   });
 
   it("renders 3 horizontal benefit cards", () => {

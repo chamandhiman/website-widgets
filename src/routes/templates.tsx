@@ -1,7 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/StudioLayout";
 import { WIDGETS } from "@/lib/widgets";
+import { useAuth } from "@/lib/auth";
+import { toast } from "sonner";
 
 const TEMPLATES = [
   { title: "Trust-building reviews", type: "google-reviews", note: "Grid of Google reviews with rating summary." },
@@ -22,7 +24,31 @@ export const Route = createFileRoute("/templates")({
       { property: "og:description", content: "Start from ready-made widget templates." },
     ],
   }),
-  component: () => (
+  component: TemplatesPage,
+});
+
+function TemplatesPage() {
+  const navigate = useNavigate();
+  let authContext: any = null;
+  try {
+    authContext = useAuth();
+  } catch {}
+  const user = authContext?.user || null;
+
+  const handleUseTemplate = (type: string, e: React.MouseEvent) => {
+    if (!user) {
+      e.preventDefault();
+      toast("Please login to create widgets", {
+        description: "Sign in to customize, save, and install widgets on your website.",
+        action: {
+          label: "Sign In",
+          onClick: () => navigate({ to: "/login" }),
+        },
+      });
+    }
+  };
+
+  return (
     <div className="mx-auto max-w-7xl p-4 md:p-8">
       <PageHeader title="Templates" description="Start from a ready-made setup and make it yours." />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -33,11 +59,19 @@ export const Route = createFileRoute("/templates")({
               <Icon className="mb-3 h-6 w-6 text-primary" />
               <h3 className="font-semibold">{t.title}</h3>
               <p className="mb-4 text-sm text-muted-foreground">{t.note}</p>
-              <Button asChild size="sm" className="mt-auto self-start"><Link to="/editor/$type" params={{ type: t.type }}>Use template</Link></Button>
+              <Button asChild size="sm" className="mt-auto self-start cursor-pointer">
+                <Link
+                  to="/editor/$type"
+                  params={{ type: t.type }}
+                  onClick={(e) => handleUseTemplate(t.type, e)}
+                >
+                  Use template
+                </Link>
+              </Button>
             </div>
           );
         })}
       </div>
     </div>
-  ),
-});
+  );
+}

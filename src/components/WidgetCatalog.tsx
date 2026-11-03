@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { useAuth } from "@/lib/auth";
 import {
   Search,
   Plus,
@@ -147,11 +148,34 @@ export function WidgetCatalog() {
     return list;
   }, [q, cat, filterTab, sortBy]);
 
-  const handleCreateClick = (w: WidgetDef) => {
+  const navigate = useNavigate();
+  let authContext: any = null;
+  try {
+    authContext = useAuth();
+  } catch {}
+  const user = authContext?.user || null;
+
+  const handleCreateClick = (w: WidgetDef, e?: React.MouseEvent) => {
+    if (!user) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      toast("Please login to create widgets", {
+        description: "Sign in to customize, save, and install widgets on your website.",
+        action: {
+          label: "Sign In",
+          onClick: () => navigate({ to: "/login" }),
+        },
+      });
+      return false;
+    }
     const usage = getPlanUsage();
     if (usage.count >= usage.limit) {
       toast.error(`You have reached the free plan limit (${usage.limit} widgets). Please upgrade to create more.`);
+      return false;
     }
+    return true;
   };
 
   return (
@@ -439,9 +463,9 @@ export function WidgetCatalog() {
                           <Link
                             to="/editor/$type"
                             params={{ type: w.type }}
-                            onClick={() => handleCreateClick(w)}
+                            onClick={(e) => handleCreateClick(w, e)}
                             aria-label={`Create Widget ${w.name}`}
-                            className="flex items-center gap-1.5 rounded-xl border border-slate-200/90 bg-white px-3.5 py-1.5 text-xs font-bold text-slate-800 shadow-2xs hover:bg-[#7c3aed] hover:text-white hover:border-[#7c3aed] transition-all active:scale-98"
+                            className="flex items-center gap-1.5 rounded-xl border border-slate-200/90 bg-white px-3.5 py-1.5 text-xs font-bold text-slate-800 shadow-2xs hover:bg-[#7c3aed] hover:text-white hover:border-[#7c3aed] transition-all active:scale-98 cursor-pointer"
                           >
                             <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
                             <span>Add widget</span>
@@ -520,8 +544,16 @@ export function WidgetCatalog() {
                   <Button variant="ghost" size="sm" onClick={() => setDemoWidget(null)} className="text-xs">
                     Close
                   </Button>
-                  <Button asChild size="sm" className="bg-[#7c3aed] text-white text-xs">
-                    <Link to="/editor/$type" params={{ type: demoWidget.type }}>
+                  <Button asChild size="sm" className="bg-[#7c3aed] text-white text-xs cursor-pointer">
+                    <Link
+                      to="/editor/$type"
+                      params={{ type: demoWidget.type }}
+                      onClick={(e) => {
+                        if (!handleCreateClick(demoWidget, e)) {
+                          setDemoWidget(null);
+                        }
+                      }}
+                    >
                       + Add Widget
                     </Link>
                   </Button>
