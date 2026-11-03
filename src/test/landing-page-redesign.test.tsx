@@ -204,5 +204,9 @@ describe("Premium SaaS Landing Page Redesign", () => {
     expect(footer.textContent).not.toContain("Subscribe");
     expect(footer.textContent).not.toContain("Newsletter");
     expect(footer.textContent).not.toContain("Get Updates");
+
+    // STRICT CHECK: Footer menu must NOT contain "My Account" or "Sign In"
+    expect(within(footer).queryByText("My Account")).toBeNull();
+    expect(within(footer).queryByText("Sign In")).toBeNull();
   });
 });

@@ -1544,11 +1544,6 @@ function LandingPage() {
                     Help Center
                   </a>
                 </li>
-                <li>
-                  <Link to="/dashboard" className="hover:text-purple-600 transition-colors">
-                    My Account
-                  </Link>
-                </li>
               </ul>
             </div>
 
@@ -1576,11 +1571,6 @@ function LandingPage() {
                   >
                     Contact Us
                   </a>
-                </li>
-                <li>
-                  <Link to="/login" className="hover:text-purple-600 transition-colors">
-                    Sign In
-                  </Link>
                 </li>
               </ul>
             </div>
