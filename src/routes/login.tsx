@@ -7,9 +7,10 @@ import { toast } from "sonner";
 type AuthMode = "signin" | "signup" | "forgot";
 
 export const Route = createFileRoute("/login")({
-  validateSearch: (search: Record<string, unknown>): { redirect?: string } => ({
-    redirect: typeof search["redirect"] === "string" ? (search["redirect"] as string) : undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): { redirect?: string } => {
+    const redirect = typeof search["redirect"] === "string" ? (search["redirect"] as string) : undefined;
+    return redirect ? { redirect } : {};
+  },
   head: () => ({
     meta: [
       { title: "Sign In — Website Widgets by WebToolOcean" },

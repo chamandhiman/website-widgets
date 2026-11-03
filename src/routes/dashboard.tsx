@@ -57,14 +57,15 @@ function DashboardPage() {
 
   useEffect(() => {
     loadData();
-    if (typeof window !== "undefined") {
-      window.addEventListener("wto-saved-changed", loadData);
-      window.addEventListener("storage", loadData);
-      return () => {
-        window.removeEventListener("wto-saved-changed", loadData);
-        window.removeEventListener("storage", loadData);
-      };
+    if (typeof window === "undefined") {
+      return;
     }
+    window.addEventListener("wto-saved-changed", loadData);
+    window.addEventListener("storage", loadData);
+    return () => {
+      window.removeEventListener("wto-saved-changed", loadData);
+      window.removeEventListener("storage", loadData);
+    };
   }, []);
 
   const handleDelete = (id: string) => {

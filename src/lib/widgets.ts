@@ -16,6 +16,8 @@ export interface WidgetDef {
   kind: Kind;
   icon: LucideIcon;
   ready: boolean;
+  designsCount?: number;
+  badge?: string;
 }
 
 export const PRIORITY_WIDGET_TYPES: readonly string[] = [
