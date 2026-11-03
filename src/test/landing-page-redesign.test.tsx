@@ -68,14 +68,34 @@ describe("Premium SaaS Landing Page Redesign", () => {
     expect(screen.getByText("Sign out")).toBeInTheDocument();
   });
 
-  it("renders Sign In and Get Started buttons when user is logged out", () => {
+  it("renders Sign In and Get Started buttons when user signs out or is logged out", () => {
     currentAuthUser = null;
+    sessionStorage.setItem("ww_logged_out", "true");
     const LandingComponent = Route.options.component!;
     const { container } = render(<LandingComponent />);
 
     const header = container.querySelector("header")!;
     expect(within(header).getByRole("link", { name: "Sign In" })).toBeInTheDocument();
     expect(within(header).getByRole("link", { name: "Get Started" })).toBeInTheDocument();
+    sessionStorage.removeItem("ww_logged_out");
+  });
+
+  it("transitions to logged-out state when user clicks Sign out in profile dropdown", () => {
+    currentAuthUser = mockUser;
+    const LandingComponent = Route.options.component!;
+    const { container } = render(<LandingComponent />);
+
+    const header = container.querySelector("header")!;
+    const userTrigger = within(header).getByRole("button", { name: /just test/i });
+    fireEvent.click(userTrigger);
+
+    const signOutBtn = screen.getByRole("button", { name: /Sign out/i });
+    fireEvent.click(signOutBtn);
+
+    expect(mockSignOut).toHaveBeenCalled();
+    expect(within(header).getByRole("link", { name: "Sign In" })).toBeInTheDocument();
+    expect(within(header).getByRole("link", { name: "Get Started" })).toBeInTheDocument();
+    sessionStorage.removeItem("ww_logged_out");
   });
 
   it("renders hero section with eyebrow, heading, CTAs, and 3 benefits", () => {

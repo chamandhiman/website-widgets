@@ -22,7 +22,6 @@ import {
   LayoutGrid,
   MoreHorizontal,
   ChevronDown,
-  ChevronRight,
   LayoutDashboard,
   LogOut,
   SlidersHorizontal,
@@ -360,6 +359,38 @@ function LandingPage() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
 
+  // Explicit log out state: if user signs out in session, respect logged-out state
+  const [loggedOut, setLoggedOut] = useState(() => {
+    if (typeof window !== "undefined") {
+      try {
+        return sessionStorage.getItem("ww_logged_out") === "true";
+      } catch {
+        return false;
+      }
+    }
+    return false;
+  });
+
+  // If a real Firebase user signs in, clear logged-out flag
+  useEffect(() => {
+    if (user && typeof window !== "undefined") {
+      try {
+        sessionStorage.removeItem("ww_logged_out");
+      } catch {}
+      setLoggedOut(false);
+    }
+  }, [user]);
+
+  // Active user: real Firebase user if signed in, or default reference user "just test" unless explicitly logged out
+  const activeUser = loggedOut
+    ? null
+    : user || {
+        uid: "default-user",
+        displayName: "just test",
+        email: "wejusttest365@gmail.com",
+        photoURL: null,
+      };
+
   // Header state
   const [profileOpen, setProfileOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -394,6 +425,21 @@ function LandingPage() {
     };
   }, [profileOpen]);
 
+  // Close profile dropdown on Escape key
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setProfileOpen(false);
+      }
+    }
+    if (profileOpen) {
+      document.addEventListener("keydown", handleKeyDown);
+    }
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [profileOpen]);
+
   // Live countdown second interval
   useEffect(() => {
     const timer = setInterval(() => {
@@ -418,7 +464,8 @@ function LandingPage() {
   // Number of user's saved widgets
   const savedCount = useMemo(() => {
     try {
-      return loadSaved().length;
+      const saved = loadSaved();
+      return saved.length || 2;
     } catch {
       return 2;
     }
@@ -457,27 +504,27 @@ function LandingPage() {
     }
   };
 
-  const userName = user?.displayName || user?.email?.split("@")[0] || "just test";
+  const userName = activeUser?.displayName || activeUser?.email?.split("@")[0] || "just test";
   const userInitial = userName.charAt(0).toUpperCase();
 
   return (
     <div className="min-h-screen bg-[#faf9ff] text-slate-900 font-sans selection:bg-purple-100 selection:text-purple-900">
       {/* ====================================================================
-          1. HEADER
+          1. HEADER – CENTERED FLOATING PILL CONTAINER (APPROX 90-92% WIDTH, NOT FULL WIDTH)
           ==================================================================== */}
-      <header className="sticky top-0 z-40 w-full bg-white/90 backdrop-blur-md border-b border-slate-100 transition-all">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+      <div className="sticky top-3 sm:top-4 z-40 w-full px-4 sm:px-6 flex justify-center pointer-events-none">
+        <header className="pointer-events-auto w-[92%] max-w-[1440px] bg-white/95 backdrop-blur-md border border-slate-200/80 shadow-lg shadow-purple-900/5 rounded-[40px] px-5 sm:px-8 py-2.5 sm:py-3 flex items-center justify-between gap-4 transition-all">
           {/* Left: Brand Logo */}
           <Link to="/" className="flex items-center gap-2 group shrink-0">
             <img
               src="/logo.png"
               alt="Website Widgets by WebToolOcean"
-              className="h-9 w-auto object-contain transition-transform group-hover:scale-[1.02]"
+              className="h-8 sm:h-9 w-auto object-contain transition-transform group-hover:scale-[1.02]"
             />
           </Link>
 
           {/* Center: Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
+          <nav className="hidden md:flex items-center gap-7 lg:gap-9 text-sm font-semibold text-slate-600">
             <Link to="/templates" className="hover:text-purple-600 transition-colors">
               Templates
             </Link>
@@ -495,21 +542,24 @@ function LandingPage() {
             </a>
           </nav>
 
-          {/* Right: Auth User Dropdown / Login State */}
-          <div className="flex items-center gap-3">
-            {user ? (
+          {/* Right: Auth Profile / Logged-out State */}
+          <div className="flex items-center gap-3 shrink-0">
+            {activeUser ? (
               <div className="relative" ref={profileDropdownRef}>
-                {/* Logged in Trigger */}
+                {/* Profile Trigger Button - clicking ONLY toggles the dropdown, NEVER navigates */}
                 <button
                   type="button"
-                  onClick={() => setProfileOpen(!profileOpen)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setProfileOpen((prev) => !prev);
+                  }}
                   aria-expanded={profileOpen}
                   aria-haspopup="true"
-                  className="flex items-center gap-2.5 pl-1.5 pr-3 py-1.5 rounded-full border border-slate-200/70 hover:border-purple-200 bg-white hover:bg-slate-50 transition-all shadow-sm cursor-pointer"
+                  className="flex items-center gap-2.5 pl-1.5 pr-3 py-1.5 rounded-full border border-slate-200/70 hover:border-purple-300 bg-white hover:bg-slate-50 transition-all shadow-sm cursor-pointer select-none"
                 >
-                  {user.photoURL ? (
+                  {activeUser.photoURL ? (
                     <img
-                      src={user.photoURL}
+                      src={activeUser.photoURL}
                       alt={userName}
                       className="h-8 w-8 rounded-full object-cover ring-2 ring-purple-100"
                     />
@@ -522,20 +572,28 @@ function LandingPage() {
                     {userName}
                   </span>
                   <ChevronDown
-                    className={`h-4 w-4 text-slate-500 transition-transform duration-200 ${profileOpen ? "rotate-180" : ""
-                      }`}
+                    className={`h-4 w-4 text-slate-500 transition-transform duration-200 ${
+                      profileOpen ? "rotate-180" : ""
+                    }`}
                   />
                 </button>
 
-                {/* Profile Floating Dropdown Menu */}
+                {/* Small Anchored Dropdown Menu:
+                    - Positioned immediately below the profile trigger (absolute right-0 top-full mt-2.5)
+                    - Compact width 275px (within 260-290px requirement)
+                    - Rounded-2xl (16px), subtle border, soft shadow, z-50
+                    - NO modal backdrop or overlay; page behind remains visible and usable */}
                 {profileOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-72 rounded-2xl border border-slate-100 bg-white p-2 shadow-2xl shadow-purple-900/15 z-50 animate-in fade-in zoom-in-95 duration-150">
-                    {/* Header info */}
+                  <div
+                    role="menu"
+                    className="absolute right-0 top-full mt-2.5 w-[275px] rounded-2xl border border-slate-200/80 bg-white p-2 shadow-2xl shadow-purple-900/15 z-50 animate-in fade-in zoom-in-95 duration-150 select-none text-left"
+                  >
+                    {/* 1. User avatar, username, and email */}
                     <div className="p-3 bg-slate-50/80 rounded-xl mb-1.5">
                       <div className="flex items-center gap-3">
-                        {user.photoURL ? (
+                        {activeUser.photoURL ? (
                           <img
-                            src={user.photoURL}
+                            src={activeUser.photoURL}
                             alt={userName}
                             className="h-10 w-10 rounded-full object-cover ring-2 ring-purple-200"
                           />
@@ -545,8 +603,13 @@ function LandingPage() {
                           </div>
                         )}
                         <div className="min-w-0 flex-1">
-                          <p className="text-sm font-bold text-slate-900 truncate">{userName}</p>
-                          <p className="text-xs text-slate-500 truncate">{user.email}</p>
+                          <p className="text-sm font-bold text-slate-900 truncate">
+                            {userName}
+                          </p>
+                          <p className="text-xs text-slate-500 truncate">
+                            {activeUser.email || "wejusttest365@gmail.com"}
+                          </p>
+                          {/* 2. Free Plan / Pro Plan badge */}
                           <span className="inline-block mt-1 text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">
                             FREE PLAN
                           </span>
@@ -554,14 +617,15 @@ function LandingPage() {
                       </div>
                     </div>
 
+                    {/* 3. Divider */}
                     <div className="h-px bg-slate-100 my-1" />
 
-                    {/* Navigation Items */}
+                    {/* 4. Dashboard – Manage your widgets */}
                     <div className="space-y-0.5">
                       <Link
                         to="/dashboard"
                         onClick={() => setProfileOpen(false)}
-                        className="w-full flex items-center justify-between px-3 py-2.5 text-left rounded-xl hover:bg-slate-50 transition-colors group"
+                        className="w-full flex items-center justify-between px-3 py-2.5 text-left rounded-xl hover:bg-slate-50 transition-colors group cursor-pointer"
                       >
                         <div className="flex items-center gap-2.5">
                           <div className="h-8 w-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center group-hover:bg-purple-100 transition-colors">
@@ -575,10 +639,11 @@ function LandingPage() {
                         <ArrowRight className="h-4 w-4 text-slate-400 group-hover:text-purple-600 transition-colors" />
                       </Link>
 
+                      {/* 5. My Websites */}
                       <Link
                         to="/my-widgets"
                         onClick={() => setProfileOpen(false)}
-                        className="w-full flex items-center justify-between px-3 py-2.5 text-left rounded-xl hover:bg-slate-50 transition-colors group"
+                        className="w-full flex items-center justify-between px-3 py-2.5 text-left rounded-xl hover:bg-slate-50 transition-colors group cursor-pointer"
                       >
                         <div className="flex items-center gap-2.5">
                           <div className="h-8 w-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center group-hover:bg-blue-100 transition-colors">
@@ -594,10 +659,11 @@ function LandingPage() {
                         <ArrowRight className="h-4 w-4 text-slate-400 group-hover:text-blue-600 transition-colors" />
                       </Link>
 
+                      {/* 6. Explore Widgets */}
                       <Link
                         to="/widgets"
                         onClick={() => setProfileOpen(false)}
-                        className="w-full flex items-center gap-2.5 px-3 py-2.5 text-left rounded-xl hover:bg-slate-50 transition-colors group"
+                        className="w-full flex items-center gap-2.5 px-3 py-2.5 text-left rounded-xl hover:bg-slate-50 transition-colors group cursor-pointer"
                       >
                         <div className="h-8 w-8 rounded-lg bg-pink-50 text-pink-600 flex items-center justify-center group-hover:bg-pink-100 transition-colors">
                           <Compass className="h-4 w-4" />
@@ -606,13 +672,20 @@ function LandingPage() {
                       </Link>
                     </div>
 
+                    {/* 7. Divider */}
                     <div className="h-px bg-slate-100 my-1" />
 
-                    {/* Sign Out */}
+                    {/* 8. Sign Out */}
                     <button
                       type="button"
                       onClick={() => {
                         setProfileOpen(false);
+                        setLoggedOut(true);
+                        if (typeof window !== "undefined") {
+                          try {
+                            sessionStorage.setItem("ww_logged_out", "true");
+                          } catch {}
+                        }
                         signOut();
                       }}
                       className="w-full flex items-center gap-2.5 px-3 py-2 text-left rounded-xl text-rose-600 hover:bg-rose-50 text-sm font-semibold transition-colors cursor-pointer"
@@ -624,75 +697,76 @@ function LandingPage() {
                 )}
               </div>
             ) : (
+              /* Logged-out state: Sign In and Get Started inside the floating pill */
               <div className="flex items-center gap-3">
                 <Link
                   to="/login"
-                  className="text-sm font-semibold text-slate-700 hover:text-slate-900 px-3.5 py-2 rounded-xl hover:bg-slate-100/70 transition-colors"
+                  className="text-sm font-semibold text-slate-700 hover:text-slate-900 px-3.5 py-1.5 rounded-full hover:bg-slate-100/70 transition-colors cursor-pointer"
                 >
                   Sign In
                 </Link>
                 <Link
                   to="/login"
-                  className="text-sm font-semibold text-white px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 via-violet-600 to-pink-500 hover:opacity-95 shadow-md shadow-purple-500/20 transition-all hover:scale-[1.02]"
+                  className="text-sm font-semibold text-white px-4 py-2 rounded-full bg-gradient-to-r from-purple-600 via-violet-600 to-pink-500 hover:opacity-95 shadow-md shadow-purple-500/20 transition-all hover:scale-[1.02] cursor-pointer"
                 >
                   Get Started
                 </Link>
               </div>
             )}
 
-            {/* Mobile menu trigger */}
+            {/* Mobile menu button */}
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100 transition-colors"
+              className="md:hidden p-2 rounded-full text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
               aria-label="Toggle Navigation"
             >
-              {mobileMenuOpen ? <X className="h-6 w-6" /> : <MenuIcon className="h-6 w-6" />}
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <MenuIcon className="h-5 w-5" />}
             </button>
           </div>
-        </div>
+        </header>
+      </div>
 
-        {/* Mobile menu drawer */}
-        {mobileMenuOpen && (
-          <div className="md:hidden border-t border-slate-100 bg-white px-4 py-4 space-y-3">
-            <Link
-              to="/templates"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block text-base font-medium text-slate-700 hover:text-purple-600 py-1"
-            >
-              Templates
-            </Link>
-            <a
-              href="#features"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block text-base font-medium text-slate-700 hover:text-purple-600 py-1"
-            >
-              Features
-            </a>
-            <Link
-              to="/widgets"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block text-base font-medium text-slate-700 hover:text-purple-600 py-1"
-            >
-              Widgets
-            </Link>
-            <Link
-              to="/settings"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block text-base font-medium text-slate-700 hover:text-purple-600 py-1"
-            >
-              Pricing
-            </Link>
-            <a
-              href="#benefits"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block text-base font-medium text-slate-700 hover:text-purple-600 py-1"
-            >
-              Help
-            </a>
-          </div>
-        )}
-      </header>
+      {/* Mobile Drawer (Anchored below floating header) */}
+      {mobileMenuOpen && (
+        <div className="md:hidden fixed top-20 left-4 right-4 z-40 rounded-3xl border border-slate-200/80 bg-white/95 backdrop-blur-xl p-5 shadow-2xl space-y-3 animate-in fade-in zoom-in-95 duration-150">
+          <Link
+            to="/templates"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block text-base font-semibold text-slate-800 hover:text-purple-600 py-1"
+          >
+            Templates
+          </Link>
+          <a
+            href="#features"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block text-base font-semibold text-slate-800 hover:text-purple-600 py-1"
+          >
+            Features
+          </a>
+          <Link
+            to="/widgets"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block text-base font-semibold text-slate-800 hover:text-purple-600 py-1"
+          >
+            Widgets
+          </Link>
+          <Link
+            to="/settings"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block text-base font-semibold text-slate-800 hover:text-purple-600 py-1"
+          >
+            Pricing
+          </Link>
+          <a
+            href="#benefits"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block text-base font-semibold text-slate-800 hover:text-purple-600 py-1"
+          >
+            Help
+          </a>
+        </div>
+      )}
 
       {/* ====================================================================
           2. HERO SECTION
@@ -1000,23 +1074,26 @@ function LandingPage() {
                       key={cat.id}
                       type="button"
                       onClick={() => setSelectedCat(cat.id)}
-                      className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm transition-all font-medium cursor-pointer ${isActive
+                      className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm transition-all font-medium cursor-pointer ${
+                        isActive
                           ? "bg-purple-600 text-white font-semibold shadow-md shadow-purple-600/20"
                           : "text-slate-700 hover:bg-slate-50 hover:text-purple-600"
-                        }`}
+                      }`}
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
                         <Icon
-                          className={`h-4 w-4 shrink-0 ${isActive ? "text-white" : "text-slate-400"
-                            }`}
+                          className={`h-4 w-4 shrink-0 ${
+                            isActive ? "text-white" : "text-slate-400"
+                          }`}
                         />
                         <span className="truncate">{cat.name}</span>
                       </div>
                       <span
-                        className={`text-xs px-2 py-0.5 rounded-full font-semibold ${isActive
+                        className={`text-xs px-2 py-0.5 rounded-full font-semibold ${
+                          isActive
                             ? "bg-white/20 text-white"
                             : "bg-slate-100 text-slate-500"
-                          }`}
+                        }`}
                       >
                         {cat.count}
                       </span>
@@ -1177,15 +1254,15 @@ function LandingPage() {
                             "popup",
                             "testimonial-slider",
                           ].includes(widget.id) && (
-                              <div className="flex flex-col items-center gap-2">
-                                <div className="h-12 w-12 rounded-2xl bg-white border border-purple-100 text-purple-600 flex items-center justify-center shadow-sm">
-                                  <widget.icon className="h-6 w-6" />
-                                </div>
-                                <span className="text-xs font-semibold text-slate-600">
-                                  {widget.name}
-                                </span>
+                            <div className="flex flex-col items-center gap-2">
+                              <div className="h-12 w-12 rounded-2xl bg-white border border-purple-100 text-purple-600 flex items-center justify-center shadow-sm">
+                                <widget.icon className="h-6 w-6" />
                               </div>
-                            )}
+                              <span className="text-xs font-semibold text-slate-600">
+                                {widget.name}
+                              </span>
+                            </div>
+                          )}
                         </div>
 
                         {/* Title & Description */}
@@ -1651,16 +1728,16 @@ function LandingPage() {
                 "popup",
                 "testimonial-slider",
               ].includes(previewWidget.id) && (
-                  <div className="text-center p-4">
-                    <div className="h-16 w-16 rounded-3xl bg-white border border-purple-100 text-purple-600 flex items-center justify-center mx-auto mb-3 shadow-md">
-                      <previewWidget.icon className="h-8 w-8" />
-                    </div>
-                    <h4 className="text-base font-bold text-slate-800">{previewWidget.name}</h4>
-                    <p className="text-xs text-slate-500 max-w-xs mt-1">
-                      {previewWidget.description}
-                    </p>
+                <div className="text-center p-4">
+                  <div className="h-16 w-16 rounded-3xl bg-white border border-purple-100 text-purple-600 flex items-center justify-center mx-auto mb-3 shadow-md">
+                    <previewWidget.icon className="h-8 w-8" />
                   </div>
-                )}
+                  <h4 className="text-base font-bold text-slate-800">{previewWidget.name}</h4>
+                  <p className="text-xs text-slate-500 max-w-xs mt-1">
+                    {previewWidget.description}
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Modal actions */}
