@@ -206,11 +206,7 @@ describe("Premium SaaS Landing Page Redesign", () => {
 
     const addWidgetButtons = screen.getAllByRole("button", { name: /Add Widget/i });
     expect(addWidgetButtons.length).toBeGreaterThan(0);
-    const firstButton = addWidgetButtons[0];
-    expect(firstButton).toBeDefined();
-    if (!firstButton) {
-      throw new Error("Expected at least one Add Widget button");
-    }
+    const firstButton: HTMLElement = addWidgetButtons[0]!;
     fireEvent.click(firstButton);
 
     expect(mockToast).toHaveBeenCalledWith(
